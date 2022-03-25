@@ -2,12 +2,12 @@
 
 module Network.Wai.Handler.Warp.HashMap where
 
-import Data.Hashable (hash)
-import Data.IntMap.Strict (IntMap)
+import           Data.Hashable      (hash)
+import           Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as I
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as M
-import Prelude hiding (lookup)
+import           Data.Map.Strict    (Map)
+import qualified Data.Map.Strict    as M
+import           Prelude            hiding (lookup)
 
 ----------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Network.Wai.Middleware.Push.Referer.Manager (
     MakePushPromise
@@ -13,13 +13,14 @@ module Network.Wai.Middleware.Push.Referer.Manager (
   , Network.Wai.Middleware.Push.Referer.Manager.insert
   ) where
 
-import Control.Monad (unless)
-import Data.IORef
-import Network.Wai.Handler.Warp hiding (Settings, defaultSettings)
-import System.IO.Unsafe (unsafePerformIO)
+import           Control.Monad                             (unless)
+import           Data.IORef
+import           Network.Wai.Handler.Warp                  hiding (Settings,
+                                                            defaultSettings)
+import           System.IO.Unsafe                          (unsafePerformIO)
 
-import Network.Wai.Middleware.Push.Referer.Types
-import qualified Network.Wai.Middleware.Push.Referer.LRU as LRU
+import qualified Network.Wai.Middleware.Push.Referer.LRU   as LRU
+import           Network.Wai.Middleware.Push.Referer.Types
 
 newtype Manager = Manager (IORef (LRU.Cache URLPath PushPromise))
 

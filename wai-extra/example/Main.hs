@@ -1,17 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Data.ByteString.Builder (string8)
-import Control.Concurrent (forkIO, threadDelay)
-import Control.Concurrent.Chan
-import Control.Monad
-import Data.Time.Clock.POSIX (getPOSIXTime)
-import Network.HTTP.Types (status200)
-import Network.Wai (Application, Middleware, pathInfo, responseFile)
-import Network.Wai.EventSource (ServerEvent(..), eventSourceAppChan, eventSourceAppIO)
-import Network.Wai.Handler.Warp (run)
-import Network.Wai.Middleware.AddHeaders (addHeaders)
-import Network.Wai.Middleware.Gzip (gzip, def)
+import           Control.Concurrent                (forkIO, threadDelay)
+import           Control.Concurrent.Chan
+import           Control.Monad
+import           Data.ByteString.Builder           (string8)
+import           Data.Time.Clock.POSIX             (getPOSIXTime)
+import           Network.HTTP.Types                (status200)
+import           Network.Wai                       (Application, Middleware,
+                                                    pathInfo, responseFile)
+import           Network.Wai.EventSource           (ServerEvent (..),
+                                                    eventSourceAppChan,
+                                                    eventSourceAppIO)
+import           Network.Wai.Handler.Warp          (run)
+import           Network.Wai.Middleware.AddHeaders (addHeaders)
+import           Network.Wai.Middleware.Gzip       (def, gzip)
 
 
 app :: Chan ServerEvent -> Application

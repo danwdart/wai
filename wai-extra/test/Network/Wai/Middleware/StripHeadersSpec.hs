@@ -4,19 +4,19 @@ module Network.Wai.Middleware.StripHeadersSpec
     , spec
     ) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Network.Wai.Middleware.AddHeaders
-import Network.Wai.Middleware.StripHeaders
+import           Network.Wai.Middleware.AddHeaders
+import           Network.Wai.Middleware.StripHeaders
 
-import Control.Arrow (first)
-import Data.ByteString (ByteString)
-import Data.Monoid ((<>))
-import Network.HTTP.Types (status200)
-import Network.Wai
-import Network.Wai.Test
+import           Control.Arrow                       (first)
+import           Data.ByteString                     (ByteString)
+import           Data.Monoid                         ((<>))
+import           Network.HTTP.Types                  (status200)
+import           Network.Wai
+import           Network.Wai.Test
 
-import qualified Data.CaseInsensitive as CI
+import qualified Data.CaseInsensitive                as CI
 
 
 main :: IO ()

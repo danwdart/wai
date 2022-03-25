@@ -1,21 +1,23 @@
-{-# LANGUAGE TemplateHaskell, QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module EmbeddedTestEntries where
 
-import WaiAppStatic.Storage.Embedded
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy          as BL
+import qualified Data.Text                     as T
+import qualified Data.Text.Lazy                as TL
+import qualified Data.Text.Lazy.Encoding       as TL
+import           WaiAppStatic.Storage.Embedded
 
 body :: Int -> Char -> BL.ByteString
-body i c = TL.encodeUtf8 $ TL.pack $ take i $ repeat c
+body i c = TL.encodeUtf8 $ TL.pack $ replicate i c
 
 mkEntries :: IO [EmbeddableEntry]
 mkEntries = return
     -- An entry that should be compressed
-  [ EmbeddableEntry "e1.txt" 
-                    "text/plain" 
+  [ EmbeddableEntry "e1.txt"
+                    "text/plain"
                     (Left ("Etag 1", body 1000 'A'))
 
     -- An entry so short that the compressed text is longer

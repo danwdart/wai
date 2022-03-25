@@ -88,20 +88,20 @@ module Network.Wai
     , modifyResponse
     ) where
 
-import           Data.ByteString.Builder      (Builder, lazyByteString)
-import           Data.ByteString.Builder      (byteString)
-import           Control.Monad                (unless)
-import qualified Data.ByteString              as B
-import qualified Data.ByteString.Lazy         as L
-import qualified Data.ByteString.Lazy.Internal as LI
+import           Control.Monad                 (unless)
+import qualified Data.ByteString               as B
+import           Data.ByteString.Builder       (Builder, byteString,
+                                                lazyByteString)
+import qualified Data.ByteString.Lazy          as L
+import           Data.ByteString.Lazy.Char8    ()
 import           Data.ByteString.Lazy.Internal (defaultChunkSize)
-import           Data.ByteString.Lazy.Char8   ()
-import           Data.Function                (fix)
-import qualified Network.HTTP.Types           as H
-import           Network.Socket               (SockAddr (SockAddrInet))
+import qualified Data.ByteString.Lazy.Internal as LI
+import           Data.Function                 (fix)
+import qualified Network.HTTP.Types            as H
+import           Network.Socket                (SockAddr (SockAddrInet))
 import           Network.Wai.Internal
-import qualified System.IO                    as IO
-import           System.IO.Unsafe             (unsafeInterleaveIO)
+import qualified System.IO                     as IO
+import           System.IO.Unsafe              (unsafeInterleaveIO)
 
 ----------------------------------------------------------------
 
@@ -238,16 +238,16 @@ responseToStream (ResponseRaw _ res) = responseToStream res
 -- | Apply the provided function to the response header list of the Response.
 mapResponseHeaders :: (H.ResponseHeaders -> H.ResponseHeaders) -> Response -> Response
 mapResponseHeaders f (ResponseFile s h b1 b2) = ResponseFile s (f h) b1 b2
-mapResponseHeaders f (ResponseBuilder s h b) = ResponseBuilder s (f h) b
-mapResponseHeaders f (ResponseStream s h b) = ResponseStream s (f h) b
-mapResponseHeaders _ r@(ResponseRaw _ _) = r
+mapResponseHeaders f (ResponseBuilder s h b)  = ResponseBuilder s (f h) b
+mapResponseHeaders f (ResponseStream s h b)   = ResponseStream s (f h) b
+mapResponseHeaders _ r@(ResponseRaw _ _)      = r
 
 -- | Apply the provided function to the response status of the Response.
 mapResponseStatus :: (H.Status -> H.Status) -> Response -> Response
 mapResponseStatus f (ResponseFile s h b1 b2) = ResponseFile (f s) h b1 b2
-mapResponseStatus f (ResponseBuilder s h b) = ResponseBuilder (f s) h b
-mapResponseStatus f (ResponseStream s h b) = ResponseStream (f s) h b
-mapResponseStatus _ r@(ResponseRaw _ _) = r
+mapResponseStatus f (ResponseBuilder s h b)  = ResponseBuilder (f s) h b
+mapResponseStatus f (ResponseStream s h b)   = ResponseStream (f s) h b
+mapResponseStatus _ r@(ResponseRaw _ _)      = r
 
 ----------------------------------------------------------------
 
@@ -536,8 +536,7 @@ lazyRequestBody req =
         if B.null bs
             then return LI.Empty
             else do
-                bss <- loop
-                return $ LI.Chunk bs bss
+                LI.Chunk bs <$> loop
 
 -- | Synonym for 'lazyRequestBody'.
 -- This function name is meant to signal the non-idempotent nature of 'lazyRequestBody'.

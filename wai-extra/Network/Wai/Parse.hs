@@ -1,8 +1,8 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                       #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE PatternGuards             #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE TypeFamilies              #-}
 -- | Some helpers for parsing data out of a raw WAI 'Request'.
 
 module Network.Wai.Parse
@@ -48,30 +48,34 @@ module Network.Wai.Parse
 #endif
     ) where
 
-import qualified Control.Exception as E
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Char8 as S8
-import Data.Word (Word8)
-import Data.Int (Int64)
-import Data.Maybe (catMaybes, fromMaybe)
-import Data.List (sortBy)
-import Data.Function (on, fix)
-import System.Directory (removeFile, getTemporaryDirectory)
-import System.IO (hClose, openBinaryTempFile)
-import System.IO.Error (isDoesNotExistError)
-import Network.Wai
-import qualified Network.HTTP.Types as H
-import Control.Applicative ((<$>))
-import Control.Exception (catchJust)
-import Control.Monad (when, unless, guard)
-import Control.Monad.Trans.Resource (allocate, release, register, InternalState, runInternalState)
-import Data.IORef
-import Network.HTTP.Types (hContentType)
-import Network.HTTP2( HTTP2Error (..), ErrorCodeId (..) )
-import Data.CaseInsensitive (mk)
+import           Control.Applicative          ((<$>))
+import           Control.Exception            (catchJust)
+import qualified Control.Exception            as E
+import           Control.Monad                (guard, unless, when)
+import           Control.Monad.Trans.Resource (InternalState, allocate,
+                                               register, release,
+                                               runInternalState)
+import qualified Data.ByteString              as S
+import qualified Data.ByteString.Char8        as S8
+import qualified Data.ByteString.Lazy         as L
+import           Data.CaseInsensitive         (mk)
+import           Data.Function                (fix, on)
+import           Data.IORef
+import           Data.Int                     (Int64)
+import           Data.List                    (sortBy)
+import           Data.Maybe                   (catMaybes, fromMaybe)
+import           Data.Word                    (Word8)
+import           Network.HTTP.Types           (hContentType)
+import qualified Network.HTTP.Types           as H
+import           Network.HTTP2                (ErrorCodeId (..),
+                                               HTTP2Error (..))
+import           Network.Wai
+import           System.Directory             (getTemporaryDirectory,
+                                               removeFile)
+import           System.IO                    (hClose, openBinaryTempFile)
+import           System.IO.Error              (isDoesNotExistError)
 
-import Prelude hiding (lines)
+import           Prelude                      hiding (lines)
 
 breakDiscard :: Word8 -> S.ByteString -> (S.ByteString, S.ByteString)
 breakDiscard w s =
@@ -100,7 +104,7 @@ parseHttpAccept = map fst
          in (s', readQ q')
     readQ s = case reads $ S8.unpack s of
                 (x, _):_ -> x
-                _ -> 1.0
+                _        -> 1.0
 
 -- | Store uploaded files in memory
 lbsBackEnd :: Monad m => ignored1 -> ignored2 -> m S.ByteString -> m L.ByteString
@@ -153,19 +157,19 @@ tempFileBackEndOpts getTmpDir pattrn internalState _ _ popper = do
 -- @since 3.0.16.0
 data ParseRequestBodyOptions = ParseRequestBodyOptions
     { -- | The maximum length of a filename
-      prboKeyLength             :: Maybe Int
+      prboKeyLength           :: Maybe Int
     , -- | The maximum number of files.
-      prboMaxNumFiles           :: Maybe Int
+      prboMaxNumFiles         :: Maybe Int
     , -- | The maximum filesize per file.
-      prboMaxFileSize           :: Maybe Int64
+      prboMaxFileSize         :: Maybe Int64
     , -- | The maximum total filesize.
-      prboMaxFilesSize          :: Maybe Int64
+      prboMaxFilesSize        :: Maybe Int64
     , -- | The maximum size of the sum of all parameters
-      prboMaxParmsSize          :: Maybe Int
+      prboMaxParmsSize        :: Maybe Int
     , -- | The maximum header lines per mime/multipart entry
-      prboMaxHeaderLines        :: Maybe Int
+      prboMaxHeaderLines      :: Maybe Int
     , -- | The maximum header line length per mime/multipart entry
-      prboMaxHeaderLineLength   :: Maybe Int }
+      prboMaxHeaderLineLength :: Maybe Int }
 
 -- | Set the maximum length of a filename.
 --
@@ -286,9 +290,9 @@ noLimitParseRequestBodyOptions = ParseRequestBodyOptions
 
 -- | Information on an uploaded file.
 data FileInfo c = FileInfo
-    { fileName :: S.ByteString
+    { fileName        :: S.ByteString
     , fileContentType :: S.ByteString
-    , fileContent :: c
+    , fileContent     :: c
     }
     deriving (Eq, Show)
 
@@ -374,7 +378,7 @@ parseRequestBodyEx :: ParseRequestBodyOptions
                    -> IO ([Param], [File y])
 parseRequestBodyEx o s r =
     case getRequestBodyType r of
-        Nothing -> return ([], [])
+        Nothing  -> return ([], [])
         Just rbt -> sinkRequestBodyEx o s rbt (requestBody r)
 
 sinkRequestBody :: BackEnd y
@@ -398,7 +402,7 @@ sinkRequestBodyEx o s r body = do
                 Left y'  -> ((y':y, z), ())
                 Right z' -> ((y, z':z), ())
     conduitRequestBodyEx o s r body add
-    (\(a, b) -> (reverse a, reverse b)) <$> readIORef ref
+    (Data.Bifunctor.bimap reverse reverse) <$> readIORef ref
 
 conduitRequestBodyEx :: ParseRequestBodyOptions
                      -> BackEnd y
@@ -458,7 +462,7 @@ takeLine maxlen src =
                           E.throwIO $ ConnectionError (UnknownErrorCode 431)
                                     "Request Header Fields Too Large"
                         Nothing -> return ()
-                    return $ Just $ killCR $ res
+                    return $ Just $ killCR res
 
 takeLines' :: Maybe Int -> Maybe Int -> Source -> IO [S.ByteString]
 takeLines' lineLength maxLines source =
@@ -498,7 +502,7 @@ readSource (Source f ref) = do
         else return bs
 
 leftover :: Source -> S.ByteString -> IO ()
-leftover (Source _ ref) bs = writeIORef ref bs
+leftover (Source _ ref) = writeIORef ref
 
 parsePiecesEx :: ParseRequestBodyOptions
               -> BackEnd y
@@ -537,7 +541,7 @@ parsePiecesEx o sink bound rbody add =
                         fi0 = FileInfo filename ct ()
                         fs = catMaybes [ prboMaxFileSize o
                                        , subtract filesSize <$> prboMaxFilesSize o ]
-                        mfs = if fs == [] then Nothing else Just $ minimum fs
+                        mfs = if null fs then Nothing else Just $ minimum fs
                     ((wasFound, fileSize), y) <- sinkTillBound' bound name fi0 sink src mfs
                     let newFilesSize = filesSize + fileSize
                     add $ Right (name, fi0 { fileContent = y })
@@ -573,7 +577,7 @@ parsePiecesEx o sink bound rbody add =
         contType = mk $ S8.pack "Content-Type"
         parsePair s =
             let (x, y) = breakDiscard 58 s -- colon
-             in (mk $ x, S.dropWhile (== 32) y) -- space
+             in (mk x, S.dropWhile (== 32) y) -- space
 
 
 data Bound = FoundBound S.ByteString S.ByteString

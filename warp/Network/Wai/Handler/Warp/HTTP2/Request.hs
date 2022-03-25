@@ -7,24 +7,27 @@ module Network.Wai.Handler.Warp.HTTP2.Request (
   , modifyHTTP2Data
   ) where
 
-import Control.Arrow (first)
-import qualified Data.ByteString.Char8 as C8
-import Data.IORef
-import qualified Data.Vault.Lazy as Vault
-import Network.HPACK
-import Network.HPACK.Token
-import qualified Network.HTTP.Types as H
-import Network.Socket (SockAddr)
-import Network.Wai
-import Network.Wai.Internal (Request(..))
-import System.IO.Unsafe (unsafePerformIO)
-import qualified System.TimeManager as T
+import           Control.Arrow                        (first)
+import qualified Data.ByteString.Char8                as C8
+import           Data.IORef
+import qualified Data.Vault.Lazy                      as Vault
+import           Network.HPACK
+import           Network.HPACK.Token
+import qualified Network.HTTP.Types                   as H
+import           Network.Socket                       (SockAddr)
+import           Network.Wai
+import           Network.Wai.Internal                 (Request (..))
+import           System.IO.Unsafe                     (unsafePerformIO)
+import qualified System.TimeManager                   as T
 
-import Network.Wai.Handler.Warp.HTTP2.Types
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Request (getFileInfoKey, pauseTimeoutKey, getClientCertificateKey)
-import qualified Network.Wai.Handler.Warp.Settings as S (Settings, settingsNoParsePath)
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.HTTP2.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Request     (getClientCertificateKey,
+                                                       getFileInfoKey,
+                                                       pauseTimeoutKey)
+import qualified Network.Wai.Handler.Warp.Settings    as S (Settings,
+                                                            settingsNoParsePath)
+import           Network.Wai.Handler.Warp.Types
 
 type ToReq = (TokenHeaderList,ValueTable) -> Maybe Int -> IO ByteString -> T.Handle -> Transport -> IO Request
 

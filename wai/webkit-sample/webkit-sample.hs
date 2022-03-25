@@ -1,11 +1,11 @@
-{-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai
-import Network.Wai.Handler.Webkit
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Lazy as L
-import Data.Enumerator (consume, Iteratee)
-import Data.ByteString.Builder (lazyByteString)
+{-# LANGUAGE Rank2Types        #-}
+import           Data.ByteString            (ByteString)
+import           Data.ByteString.Builder    (lazyByteString)
+import qualified Data.ByteString.Lazy       as L
+import           Data.Enumerator            (Iteratee, consume)
+import           Network.Wai
+import           Network.Wai.Handler.Webkit
 
 main :: IO ()
 main = putStrLn "http://localhost:3000/" >> run "Webkit Sample" app

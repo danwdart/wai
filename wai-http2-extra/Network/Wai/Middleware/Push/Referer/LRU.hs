@@ -7,12 +7,12 @@ module Network.Wai.Middleware.Push.Referer.LRU (
   , lookup
   ) where
 
-import Data.OrdPSQ (OrdPSQ)
-import qualified Data.OrdPSQ as PSQ
-import Data.Int (Int64)
-import Prelude hiding (lookup)
+import           Data.Int                                  (Int64)
+import           Data.OrdPSQ                               (OrdPSQ)
+import qualified Data.OrdPSQ                               as PSQ
+import           Prelude                                   hiding (lookup)
 
-import Network.Wai.Middleware.Push.Referer.Multi (Multi)
+import           Network.Wai.Middleware.Push.Referer.Multi (Multi)
 import qualified Network.Wai.Middleware.Push.Referer.Multi as M
 
 type Priority = Int64

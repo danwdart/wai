@@ -1,30 +1,34 @@
-{-# LANGUAGE TemplateHaskell, QuasiQuotes, OverloadedStrings, MagicHash, CPP #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE MagicHash         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module WaiAppStatic.Storage.Embedded.TH(
     Etag
   , EmbeddableEntry(..)
   , mkSettings
 ) where
 
-import Data.ByteString.Builder.Extra (byteStringInsert)
-import Codec.Compression.GZip (compress)
-import Data.ByteString.Unsafe (unsafePackAddressLen)
-import Data.Either (lefts, rights)
-import GHC.Exts (Int(..))
-import Language.Haskell.TH
-import Network.Mime (MimeType, defaultMimeLookup)
-import System.IO.Unsafe (unsafeDupablePerformIO)
-import WaiAppStatic.Types
-import WaiAppStatic.Storage.Filesystem (defaultWebAppSettings)
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
+import           Codec.Compression.GZip          (compress)
+import qualified Data.ByteString                 as B
+import           Data.ByteString.Builder.Extra   (byteStringInsert)
+import qualified Data.ByteString.Lazy            as BL
+import           Data.ByteString.Unsafe          (unsafePackAddressLen)
+import           Data.Either                     (lefts, rights)
+import           GHC.Exts                        (Int (..))
+import           Language.Haskell.TH
+import           Network.Mime                    (MimeType, defaultMimeLookup)
+import           System.IO.Unsafe                (unsafeDupablePerformIO)
+import           WaiAppStatic.Storage.Filesystem (defaultWebAppSettings)
+import           WaiAppStatic.Types
 #if !MIN_VERSION_template_haskell(2, 8, 0)
-import qualified Data.ByteString.Char8 as B8
-import qualified Data.ByteString.Lazy.Char8 as BL8
+import qualified Data.ByteString.Char8           as B8
+import qualified Data.ByteString.Lazy.Char8      as BL8
 #endif
-import qualified Data.HashMap.Strict as M
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Network.Wai as W
+import qualified Data.HashMap.Strict             as M
+import qualified Data.Text                       as T
+import qualified Data.Text.Encoding              as T
+import qualified Network.Wai                     as W
 
 -- | An Etag is used to return 304 Not Modified responses so the client does not need
 --   to download resources a second time.  Usually the etag is built from a hash of
@@ -171,13 +175,13 @@ filemapToSettings mfiles = (defaultWebAppSettings "")
         lookupFile [] = return LRNotFound
         lookupFile p =
             case M.lookup (piecesToFile p) mfiles of
-                Nothing -> return LRNotFound
+                Nothing      -> return LRNotFound
                 Just (_,act) -> LRFile <$> act
 
         lookupMime (File { fileName = p }) =
             case M.lookup (fromPiece p) mfiles of
                 Just (mime,_) -> return mime
-                Nothing -> return $ defaultMimeLookup $ fromPiece p
+                Nothing       -> return $ defaultMimeLookup $ fromPiece p
 
 -- | Create a 'StaticSettings' from a list of entries.  Executed at run time.
 entriesToSt :: [Either EmbeddedEntry ReloadEntry] -> StaticSettings
@@ -197,17 +201,17 @@ entriesToSt entries = hmap `seq` filemapToSettings hmap
 --
 -- > {-# LANGUAGE TemplateHaskell, QuasiQuotes, OverloadedStrings #-}
 -- > module A (mkEmbedded) where
--- > 
+-- >
 -- > import WaiAppStatic.Storage.Embedded
 -- > import Crypto.Hash.MD5 (hashlazy)
 -- > import qualified Data.ByteString.Lazy as BL
 -- > import qualified Data.ByteString.Base64 as B64
 -- > import qualified Data.Text as T
 -- > import qualified Data.Text.Encoding as T
--- > 
+-- >
 -- > hash :: BL.ByteString -> T.Text
 -- > hash = T.take 8 . T.decodeUtf8 . B64.encode . hashlazy
--- > 
+-- >
 -- > mkEmbedded :: IO [EmbeddableEntry]
 -- > mkEmbedded = do
 -- >     file <- BL.readFile "test.css"
@@ -216,13 +220,13 @@ entriesToSt entries = hmap `seq` filemapToSettings hmap
 -- >                 , eMimeType = "text/css"
 -- >                 , eContent  = Left (hash file, file)
 -- >                 }
--- > 
+-- >
 -- >     let reload = EmbeddableEntry {
 -- >                      eLocation = "anotherdir/test2.txt"
 -- >                    , eMimeType = "text/plain"
 -- >                    , eContent  = Right [| BL.readFile "test2.txt" >>= \c -> return (hash c, c) |]
 -- >                    }
--- > 
+-- >
 -- >     return [emb, reload]
 --
 -- The above @mkEmbedded@ will be executed at compile time.  It loads the contents of test.css and
@@ -241,16 +245,16 @@ entriesToSt entries = hmap `seq` filemapToSettings hmap
 --
 -- > {-# LANGUAGE TemplateHaskell #-}
 -- > module B where
--- > 
+-- >
 -- > import A
 -- > import Network.Wai (Application)
 -- > import Network.Wai.Application.Static (staticApp)
 -- > import WaiAppStatic.Storage.Embedded
 -- > import Network.Wai.Handler.Warp (run)
--- > 
+-- >
 -- > myApp :: Application
 -- > myApp = staticApp $(mkSettings mkEmbedded)
--- > 
+-- >
 -- > main :: IO ()
 -- > main = run 3000 myApp
 mkSettings :: IO [EmbeddableEntry] -> ExpQ

@@ -1,3 +1,5 @@
+cabal-version:       3.0
+-- Newer versions complain
 name:                warp-quic
 version:             0.0.0
 author:              Kazu Yamamoto <kazu@iij.ad.jp>
@@ -8,7 +10,6 @@ synopsis:            Warp based on QUIC
 description:         WAI handler for HTTP/3 based on QUIC
 homepage:            https://github.com/kazu-yamamoto/warp-quic
 category:            Network
-cabal-version:       >=1.10
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 

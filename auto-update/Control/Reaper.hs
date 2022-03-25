@@ -1,5 +1,5 @@
-{-# LANGUAGE RecordWildCards    #-}
-{-# LANGUAGE BangPatterns       #-}
+{-# LANGUAGE BangPatterns    #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- | This module provides the ability to create reapers: dedicated cleanup
 -- threads. These threads will automatically spawn and die based on the
@@ -32,10 +32,12 @@ module Control.Reaper (
     , mkListAction
     ) where
 
-import Control.AutoUpdate.Util (atomicModifyIORef')
-import Control.Concurrent (forkIO, threadDelay, killThread, ThreadId)
-import Control.Exception (mask_)
-import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import           Control.AutoUpdate.Util (atomicModifyIORef')
+import           Control.Concurrent      (ThreadId, forkIO, killThread,
+                                          threadDelay)
+import           Control.Exception       (mask_)
+import           Data.IORef              (IORef, newIORef, readIORef,
+                                          writeIORef)
 
 -- | Settings for creating a reaper. This type has two parameters:
 -- @workload@ gives the entire workload, whereas @item@ gives an
@@ -58,26 +60,26 @@ data ReaperSettings workload item = ReaperSettings
     -- definitely override this default.
     --
     -- @since 0.1.1
-    , reaperDelay :: {-# UNPACK #-} !Int
+    , reaperDelay  :: {-# UNPACK #-} !Int
     -- ^ Number of microseconds to delay between calls of 'reaperAction'.
     --
     -- Default: 30 seconds.
     --
     -- @since 0.1.1
-    , reaperCons :: item -> workload -> workload
+    , reaperCons   :: item -> workload -> workload
     -- ^ Add an item onto a workload.
     --
     -- Default: list consing.
     --
     -- @since 0.1.1
-    , reaperNull :: workload -> Bool
+    , reaperNull   :: workload -> Bool
     -- ^ Check if a workload is empty, in which case the worker thread
     -- will shut down.
     --
     -- Default: 'null'.
     --
     -- @since 0.1.1
-    , reaperEmpty :: workload
+    , reaperEmpty  :: workload
     -- ^ An empty workload.
     --
     -- Default: empty list.
@@ -142,17 +144,14 @@ mkReaper settings@ReaperSettings{..} = do
             Workload x -> (Workload reaperEmpty, x)
     kill tidRef = do
         mtid <- readIORef tidRef
-        case mtid of
-            Nothing  -> return ()
-            Just tid -> killThread tid
+        Data.Foldable.forM_ mtid killThread
 
 add :: ReaperSettings workload item
     -> IORef (State workload) -> IORef (Maybe ThreadId)
     -> item -> IO ()
 add settings@ReaperSettings{..} stateRef tidRef item =
     mask_ $ do
-      next <- atomicModifyIORef' stateRef cons
-      next
+      join atomicModifyIORef' stateRef cons
   where
     cons NoReaper      = let wl = reaperCons item reaperEmpty
                          in (Workload wl, spawn settings stateRef tidRef)
@@ -178,8 +177,7 @@ reaper settings@ReaperSettings{..} stateRef tidRef = do
     !merge <- reaperAction wl
     -- Merging the left jobs and new jobs.
     -- If there is no jobs, this thread finishes.
-    next <- atomicModifyIORef' stateRef (check merge)
-    next
+    join atomicModifyIORef' stateRef (check merge)
   where
     swapWithEmpty NoReaper      = error "Control.Reaper.reaper: unexpected NoReaper (1)"
     swapWithEmpty (Workload wl) = (Workload reaperEmpty, wl)

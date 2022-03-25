@@ -8,14 +8,14 @@ module Network.Wai.Middleware.MethodOverridePost
   ( methodOverridePost
   ) where
 
-import Network.Wai
-import Network.HTTP.Types           (parseQuery, hContentType)
+import           Network.HTTP.Types   (hContentType, parseQuery)
+import           Network.Wai
 
 #if __GLASGOW_HASKELL__ < 710
-import Data.Monoid                  (mconcat, mempty)
+import           Data.Monoid          (mconcat, mempty)
 #endif
-import Data.IORef
-import Data.ByteString.Lazy (toChunks)
+import           Data.ByteString.Lazy (toChunks)
+import           Data.IORef
 
 -- | Allows overriding of the HTTP request method via the _method post string parameter.
 --

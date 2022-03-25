@@ -1,26 +1,28 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE OverloadedStrings   #-}
+
+{-# LANGUAGE BangPatterns        #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Network.Wai.Handler.Warp.HTTP2.Response (
     fromResponse
   ) where
 
+import qualified Data.ByteString.Builder                as BB
+import qualified Network.HTTP.Types                     as H
+import qualified Network.HTTP2.Server                   as H2
+import           Network.Wai                            hiding (responseBuilder,
+                                                         responseFile,
+                                                         responseStream)
+import           Network.Wai.Internal                   (Response (..))
 import qualified UnliftIO
-import qualified Data.ByteString.Builder as BB
-import qualified Network.HTTP.Types as H
-import qualified Network.HTTP2.Server as H2
-import Network.Wai hiding (responseFile, responseBuilder, responseStream)
-import Network.Wai.Internal (Response(..))
 
-import Network.Wai.Handler.Warp.File
-import Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data)
-import Network.Wai.Handler.Warp.HTTP2.Types
-import Network.Wai.Handler.Warp.Header
-import qualified Network.Wai.Handler.Warp.Response as R
-import qualified Network.Wai.Handler.Warp.Settings as S
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.File
+import           Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data)
+import           Network.Wai.Handler.Warp.HTTP2.Types
+import           Network.Wai.Handler.Warp.Header
+import qualified Network.Wai.Handler.Warp.Response      as R
+import qualified Network.Wai.Handler.Warp.Settings      as S
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 

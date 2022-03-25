@@ -1,43 +1,44 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 module WaiExtraSpec (spec, toRequest) where
 
-import Test.Hspec
-import Test.HUnit hiding (Test)
+import           Test.HUnit                                hiding (Test)
+import           Test.Hspec
 #if MIN_VERSION_base(4,8,0)
-import Data.Monoid ((<>))
+import           Data.Monoid                               ((<>))
 #else
-import Data.Monoid (mempty, mappend, (<>))
+import           Data.Monoid                               (mappend, mempty,
+                                                            (<>))
 #endif
 
-import Network.Wai
-import Network.Wai.Test
-import Network.Wai.UrlMap
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString.Lazy as L
-import qualified Data.Text.Lazy as T
-import qualified Data.Text as TS
-import qualified Data.Text.Encoding as TE
-import Control.Applicative
+import           Control.Applicative
+import qualified Data.ByteString                           as S
+import qualified Data.ByteString.Char8                     as S8
+import qualified Data.ByteString.Lazy                      as L
+import qualified Data.Text                                 as TS
+import qualified Data.Text.Encoding                        as TE
+import qualified Data.Text.Lazy                            as T
+import           Network.Wai
+import           Network.Wai.Test
+import           Network.Wai.UrlMap
 
-import Network.Wai.Middleware.Jsonp
-import Network.Wai.Middleware.Gzip
-import Network.Wai.Middleware.Vhost
-import Network.Wai.Middleware.Autohead
-import Network.Wai.Middleware.MethodOverride
-import Network.Wai.Middleware.MethodOverridePost
-import Network.Wai.Middleware.AcceptOverride
-import Network.Wai.Middleware.RequestLogger
-import Codec.Compression.GZip (decompress)
-import Network.Wai.Middleware.StreamFile
+import           Codec.Compression.GZip                    (decompress)
+import           Network.Wai.Middleware.AcceptOverride
+import           Network.Wai.Middleware.Autohead
+import           Network.Wai.Middleware.Gzip
+import           Network.Wai.Middleware.Jsonp
+import           Network.Wai.Middleware.MethodOverride
+import           Network.Wai.Middleware.MethodOverridePost
+import           Network.Wai.Middleware.RequestLogger
+import           Network.Wai.Middleware.StreamFile
+import           Network.Wai.Middleware.Vhost
 
-import Control.Monad.IO.Class (liftIO)
-import Data.Maybe (fromMaybe)
-import Network.HTTP.Types (status200)
-import System.Log.FastLogger
+import           Control.Monad.IO.Class                    (liftIO)
+import           Data.Maybe                                (fromMaybe)
+import           Network.HTTP.Types                        (status200)
+import           System.Log.FastLogger
 
-import qualified Data.IORef as I
+import qualified Data.IORef                                as I
 
 spec :: Spec
 spec = do

@@ -1,4 +1,6 @@
-{-# LANGUAGE RecordWildCards, TupleSections, CPP #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections   #-}
 -- | Implements HTTP Basic Authentication.
 --
 -- This module may add digest authentication in the future.
@@ -16,16 +18,17 @@ module Network.Wai.Middleware.HttpAuth
     , extractBearerAuth
     ) where
 #if __GLASGOW_HASKELL__ < 710
-import Control.Applicative
+import           Control.Applicative
 #endif
-import Data.ByteString (ByteString)
-import Data.ByteString.Base64 (decodeLenient)
-import Data.String (IsString (..))
-import Data.Word8 (isSpace, _colon, toLower)
-import Network.HTTP.Types (status401, hContentType, hAuthorization)
-import Network.Wai
+import           Data.ByteString        (ByteString)
+import           Data.ByteString.Base64 (decodeLenient)
+import           Data.String            (IsString (..))
+import           Data.Word8             (_colon, isSpace, toLower)
+import           Network.HTTP.Types     (hAuthorization, hContentType,
+                                         status401)
+import           Network.Wai
 
-import qualified Data.ByteString as S
+import qualified Data.ByteString        as S
 
 
 -- | Check if a given username and password is valid.
@@ -41,7 +44,7 @@ type CheckCreds = ByteString
 basicAuth :: CheckCreds
           -> AuthSettings
           -> Middleware
-basicAuth checkCreds = basicAuth' (\_ -> checkCreds)
+basicAuth checkCreds = basicAuth' (const checkCreds)
 
 -- | Like 'basicAuth', but also passes a request to the authentication function.
 --
@@ -57,9 +60,9 @@ basicAuth' checkCreds AuthSettings {..} app req sendResponse = do
         else authOnNoAuth authRealm req sendResponse
   where
     check =
-        case (lookup hAuthorization $ requestHeaders req)
+        case lookup hAuthorization (requestHeaders req)
              >>= extractBasicAuth of
-            Nothing -> return False
+            Nothing                   -> return False
             Just (username, password) -> checkCreds req username password
 
 -- | Basic authentication settings. This value is an instance of
@@ -71,11 +74,11 @@ basicAuth' checkCreds AuthSettings {..} app req sendResponse = do
 --
 -- @since 1.3.4
 data AuthSettings = AuthSettings
-    { authRealm :: !ByteString
+    { authRealm       :: !ByteString
     -- ^
     --
     -- @since 1.3.4
-    , authOnNoAuth :: !(ByteString -> Application)
+    , authOnNoAuth    :: !(ByteString -> Application)
     -- ^ Takes the realm and returns an appropriate 401 response when
     -- authentication is not provided.
     --
@@ -118,7 +121,7 @@ extractBasicAuth bs =
     extract encoded =
         let raw = decodeLenient encoded
             (username, password') = S.break (== _colon) raw
-        in ((username,) . snd) <$> S.uncons password'
+        in (username,) . snd <$> S.uncons password'
 
 -- | Extract bearer authentication data from __Authorization__ header
 -- value. Returns bearer token

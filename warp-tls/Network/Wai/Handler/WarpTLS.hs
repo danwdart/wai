@@ -1,9 +1,9 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE PatternGuards      #-}
+{-# LANGUAGE RankNTypes         #-}
+{-# LANGUAGE RecordWildCards    #-}
 
 -- | HTTP over TLS support for Warp via the TLS package.
 --
@@ -52,31 +52,40 @@ module Network.Wai.Handler.WarpTLS (
     , DH.generateParams
     ) where
 
-import Control.Applicative ((<|>))
-import UnliftIO.Exception (Exception, throwIO, bracket, finally, handle, fromException, try, IOException, onException, SomeException(..), handleJust)
-import qualified UnliftIO.Exception as E
-import Control.Monad (void, guard)
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import Data.Default.Class (def)
-import qualified Data.IORef as I
-import Data.Streaming.Network (bindPortTCP, safeRecv)
-import Data.Typeable (Typeable)
-import GHC.IO.Exception (IOErrorType(..))
-import Network.Socket (Socket, close, withSocketsDo, SockAddr, accept)
+import           Control.Applicative                  ((<|>))
+import           Control.Monad                        (guard, void)
+import qualified Data.ByteString                      as S
+import qualified Data.ByteString.Lazy                 as L
+import           Data.Default.Class                   (def)
+import qualified Data.IORef                           as I
+import           Data.Streaming.Network               (bindPortTCP, safeRecv)
+import           Data.Typeable                        (Typeable)
+import           GHC.IO.Exception                     (IOErrorType (..))
+import           Network.Socket                       (SockAddr, Socket, accept,
+                                                       close, withSocketsDo)
+import           UnliftIO.Exception                   (Exception, IOException,
+                                                       SomeException (..),
+                                                       bracket, finally,
+                                                       fromException, handle,
+                                                       handleJust, onException,
+                                                       throwIO, try)
+import qualified UnliftIO.Exception                   as E
 #if MIN_VERSION_network(3,1,1)
-import Network.Socket (gracefulClose)
+import           Network.Socket                       (gracefulClose)
 #endif
-import Network.Socket.ByteString (sendAll)
-import qualified Network.TLS as TLS
-import qualified Crypto.PubKey.DH as DH
-import qualified Network.TLS.Extra as TLSExtra
-import qualified Network.TLS.SessionManager as SM
-import Network.Wai (Application)
-import Network.Wai.Handler.Warp
-import Network.Wai.Handler.Warp.Internal
-import Network.Wai.Handler.WarpTLS.Internal(CertSettings(..), TLSSettings(..), OnInsecure(..))
-import System.IO.Error (isEOFError, ioeGetErrorType)
+import qualified Crypto.PubKey.DH                     as DH
+import           Network.Socket.ByteString            (sendAll)
+import qualified Network.TLS                          as TLS
+import qualified Network.TLS.Extra                    as TLSExtra
+import qualified Network.TLS.SessionManager           as SM
+import           Network.Wai                          (Application)
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Handler.Warp.Internal
+import           Network.Wai.Handler.WarpTLS.Internal (CertSettings (..),
+                                                       OnInsecure (..),
+                                                       TLSSettings (..))
+import           System.IO.Error                      (ioeGetErrorType,
+                                                       isEOFError)
 
 -- | The default 'CertSettings'.
 defaultCertSettings :: CertSettings
@@ -139,7 +148,7 @@ tlsSettingsMemory
     :: S.ByteString -- ^ Certificate bytes
     -> S.ByteString -- ^ Key bytes
     -> TLSSettings
-tlsSettingsMemory cert key = defaultTlsSettings { 
+tlsSettingsMemory cert key = defaultTlsSettings {
     certSettings = CertFromMemory cert [] key
   }
 
@@ -152,7 +161,7 @@ tlsSettingsChainMemory
     -> [S.ByteString] -- ^ Chain certificate bytes
     -> S.ByteString -- ^ Key bytes
     -> TLSSettings
-tlsSettingsChainMemory cert chainCerts key = defaultTlsSettings { 
+tlsSettingsChainMemory cert chainCerts key = defaultTlsSettings {
     certSettings = CertFromMemory cert chainCerts key
   }
 
@@ -160,11 +169,11 @@ tlsSettingsChainMemory cert chainCerts key = defaultTlsSettings {
 -- representations of the certificate and key based on 'defaultTlsSettings'.
 --
 -- @since 3.3.0
-tlsSettingsRef 
+tlsSettingsRef
     :: I.IORef S.ByteString -- ^ Reference to certificate bytes
-    -> I.IORef (S.ByteString) -- ^ Reference to key bytes 
-    -> TLSSettings 
-tlsSettingsRef cert key = defaultTlsSettings { 
+    -> I.IORef (S.ByteString) -- ^ Reference to key bytes
+    -> TLSSettings
+tlsSettingsRef cert key = defaultTlsSettings {
     certSettings = CertFromRef cert [] key
   }
 
@@ -172,12 +181,12 @@ tlsSettingsRef cert key = defaultTlsSettings {
 -- representations of the certificate and key based on 'defaultTlsSettings'.
 --
 -- @since 3.3.0
-tlsSettingsChainRef 
+tlsSettingsChainRef
     :: I.IORef S.ByteString -- ^ Reference to certificate bytes
     -> [I.IORef S.ByteString] -- ^ Reference to chain certificate bytes
-    -> I.IORef (S.ByteString) -- ^ Reference to key bytes 
-    -> TLSSettings 
-tlsSettingsChainRef cert chainCerts key = defaultTlsSettings { 
+    -> I.IORef (S.ByteString) -- ^ Reference to key bytes
+    -> TLSSettings
+tlsSettingsChainRef cert chainCerts key = defaultTlsSettings {
     certSettings = CertFromRef cert chainCerts key
   }
 
@@ -195,11 +204,11 @@ runTLS tset set app = withSocketsDo $
 
 loadCredentials :: TLSSettings -> IO TLS.Credentials
 loadCredentials TLSSettings{ tlsCredentials = Just creds } = return creds
-loadCredentials TLSSettings{..} = case certSettings of 
+loadCredentials TLSSettings{..} = case certSettings of
   CertFromFile cert chainFiles key -> do
     cred <- either error id <$> TLS.credentialLoadX509Chain cert chainFiles key
     return $ TLS.Credentials [cred]
-  CertFromRef certRef chainCertsRef keyRef -> do 
+  CertFromRef certRef chainCertsRef keyRef -> do
     cert <- I.readIORef certRef
     chainCerts <- mapM I.readIORef chainCertsRef
     key <- I.readIORef keyRef

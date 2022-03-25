@@ -1,24 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Network.HTTP.Types (status200)
-import Blaze.ByteString.Builder (copyByteString)
-import Data.Monoid
-import qualified Data.Conduit as C
-import qualified Data.Conduit.List as CL
+import           Blaze.ByteString.Builder (copyByteString)
+import qualified Data.Conduit             as C
+import qualified Data.Conduit.List        as CL
+import           Data.Monoid
+import           Network.HTTP.Types       (status200)
+import           Network.Wai
+import           Network.Wai.Handler.Warp
 
 main = run 3000 app
 
 app req = ($
     case rawPathInfo req of
         "/builder/withlen" -> builderWithLen
-        "/builder/nolen" -> builderNoLen
-        "/file/withlen" -> fileWithLen
-        "/file/nolen" -> fileNoLen
-        "/source/withlen" -> sourceWithLen
-        "/source/nolen" -> sourceNoLen
-        "/notfound" -> responseFile status200 [] "notfound" Nothing
-        x -> index x)
+        "/builder/nolen"   -> builderNoLen
+        "/file/withlen"    -> fileWithLen
+        "/file/nolen"      -> fileNoLen
+        "/source/withlen"  -> sourceWithLen
+        "/source/nolen"    -> sourceNoLen
+        "/notfound"        -> responseFile status200 [] "notfound" Nothing
+        x                  -> index x)
 
 builderWithLen = responseBuilder
     status200

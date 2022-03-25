@@ -1,11 +1,11 @@
 module Control.AutoUpdateSpec (spec) where
 
-import Control.AutoUpdate
-import Control.Concurrent (threadDelay)
-import Control.Monad (replicateM_, forM_)
-import Data.IORef
-import Test.Hspec
-import Test.Hspec.QuickCheck
+import           Control.AutoUpdate
+import           Control.Concurrent    (threadDelay)
+import           Control.Monad         (forM_, replicateM_)
+import           Data.IORef
+import           Test.Hspec
+import           Test.Hspec.QuickCheck
 
 spec :: Spec
 spec = return ()

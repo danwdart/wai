@@ -22,12 +22,12 @@ module System.TimeManager (
   , TimeoutThread (..)
   ) where
 
-import Control.Concurrent (myThreadId)
-import qualified Control.Exception as E
-import Control.Reaper
-import Data.Typeable (Typeable)
-import Data.IORef (IORef)
-import qualified Data.IORef as I
+import           Control.Concurrent (myThreadId)
+import qualified Control.Exception  as E
+import           Control.Reaper
+import           Data.IORef         (IORef)
+import qualified Data.IORef         as I
+import           Data.Typeable      (Typeable)
 
 ----------------------------------------------------------------
 
@@ -66,7 +66,7 @@ initialize timeout = mkReaper defaultReaperSettings
             _        -> return $ Just m
 
     inactivate Active = Inactive
-    inactivate x = x
+    inactivate x      = x
 
 ----------------------------------------------------------------
 

@@ -2,12 +2,12 @@
 
 module Network.Wai.Handler.Warp.Conduit where
 
-import UnliftIO (assert, throwIO)
-import qualified Data.ByteString as S
-import qualified Data.IORef as I
+import qualified Data.ByteString                  as S
+import qualified Data.IORef                       as I
+import           UnliftIO                         (assert, throwIO)
 
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 
@@ -105,10 +105,10 @@ readCSource (CSource src ref) = do
     dropCRLF = do
         bs <- readSource src
         case S.uncons bs of
-            Nothing -> return ()
+            Nothing        -> return ()
             Just (13, bs') -> dropLF bs'
             Just (10, bs') -> leftoverSource src bs'
-            Just _ -> leftoverSource src bs
+            Just _         -> leftoverSource src bs
 
     dropLF bs =
         case S.uncons bs of

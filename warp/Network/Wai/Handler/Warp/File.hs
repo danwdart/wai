@@ -1,6 +1,6 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Network.Wai.Handler.Warp.File (
     RspFileInfo(..)
@@ -9,17 +9,17 @@ module Network.Wai.Handler.Warp.File (
   , H.parseByteRanges
   ) where
 
-import Data.Array ((!))
-import qualified Data.ByteString.Char8 as C8 (pack)
-import Network.HTTP.Date
-import qualified Network.HTTP.Types as H
-import qualified Network.HTTP.Types.Header as H
-import Network.Wai
+import           Data.Array                             ((!))
+import qualified Data.ByteString.Char8                  as C8 (pack)
+import           Network.HTTP.Date
+import qualified Network.HTTP.Types                     as H
+import qualified Network.HTTP.Types.Header              as H
+import           Network.Wai
 
 import qualified Network.Wai.Handler.Warp.FileInfoCache as I
-import Network.Wai.Handler.Warp.Header
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.PackInt
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.PackInt
 
 
 -- $setup

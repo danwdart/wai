@@ -12,11 +12,11 @@ module Network.Wai.Handler.Warp.MultiMap (
   , merge
   ) where
 
-import Data.Hashable (hash)
-import Data.IntMap.Strict (IntMap)
+import           Data.Hashable      (hash)
+import           Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as I
-import Data.Semigroup
-import Prelude -- Silence redundant import warnings
+import           Data.Semigroup
+import           Prelude
 
 ----------------------------------------------------------------
 
@@ -35,7 +35,7 @@ newtype MultiMap v = MultiMap (IntMap [(FilePath,v)])
 
 -- | O(1)
 empty :: MultiMap v
-empty = MultiMap $ I.empty
+empty = MultiMap I.empty
 
 -- | O(1)
 isEmpty :: MultiMap v -> Bool
@@ -102,7 +102,7 @@ merge (MultiMap m1) (MultiMap m2) = MultiMap mm
 ----------------------------------------------------------------
 
 prune :: ((FilePath,v) -> IO Bool) -> [(FilePath,v)] -> IO [(FilePath,v)]
-prune action xs0 = go xs0
+prune action = go
   where
     go []     = return []
     go (x:xs) = do

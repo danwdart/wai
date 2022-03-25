@@ -1,4 +1,5 @@
-{-# LANGUAGE BangPatterns, CPP #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE CPP          #-}
 
 -- | File descriptor cache to avoid locks in kernel.
 
@@ -14,13 +15,17 @@ module Network.Wai.Handler.Warp.FdCache (
   ) where
 
 #ifndef WINDOWS
-import UnliftIO.Exception (bracket)
-import Control.Reaper
-import Data.IORef
-import Network.Wai.Handler.Warp.MultiMap as MM
-import System.Posix.IO (openFd, OpenFileFlags(..), defaultFileFlags, OpenMode(ReadOnly), closeFd, FdOption(CloseOnExec), setFdOption)
+import           Control.Reaper
+import           Data.IORef
+import           Network.Wai.Handler.Warp.MultiMap as MM
+import           System.Posix.IO                   (FdOption (CloseOnExec),
+                                                    OpenFileFlags (..),
+                                                    OpenMode (ReadOnly),
+                                                    closeFd, defaultFileFlags,
+                                                    openFd, setFdOption)
+import           UnliftIO.Exception                (bracket)
 #endif
-import System.Posix.Types (Fd)
+import           System.Posix.Types                (Fd)
 
 ----------------------------------------------------------------
 

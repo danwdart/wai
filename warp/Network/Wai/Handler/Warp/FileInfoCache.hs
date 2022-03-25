@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards, CPP #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Network.Wai.Handler.Warp.FileInfoCache (
     FileInfo(..)
@@ -6,14 +7,15 @@ module Network.Wai.Handler.Warp.FileInfoCache (
   , getInfo -- test purpose only
   ) where
 
-import qualified UnliftIO (onException, bracket, throwIO)
-import Control.Reaper
-import Network.HTTP.Date
-import System.PosixCompat.Files
+import           Control.Reaper
+import           Network.HTTP.Date
+import           System.PosixCompat.Files
+import qualified UnliftIO                         (bracket, onException,
+                                                   throwIO)
 
-import Network.Wai.Handler.Warp.HashMap (HashMap)
+import           Network.Wai.Handler.Warp.HashMap (HashMap)
 import qualified Network.Wai.Handler.Warp.HashMap as M
-import Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Imports
 
 ----------------------------------------------------------------
 
@@ -97,7 +99,7 @@ initialize duration = mkReaper settings
     settings = defaultReaperSettings {
         reaperAction = override
       , reaperDelay  = duration
-      , reaperCons   = \(path,v) -> M.insert path v
+      , reaperCons   = uncurry M.insert
       , reaperNull   = M.isEmpty
       , reaperEmpty  = M.empty
       }

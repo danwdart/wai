@@ -1,4 +1,5 @@
-{-# LANGUAGE Rank2Types, ScopedTypeVariables #-}
+{-# LANGUAGE Rank2Types          #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 ---------------------------------------------------------
 -- |
 -- Module        : Network.Wai.Middleware.Gzip
@@ -22,32 +23,34 @@ module Network.Wai.Middleware.Gzip
     , defaultCheckMime
     ) where
 
-import Network.Wai
-import Data.Maybe (fromMaybe, isJust)
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString as S
-import Data.Default.Class
-import Network.HTTP.Types ( Status, Header, hContentEncoding, hUserAgent
-                          , hContentType, hContentLength)
-import Network.HTTP.Types.Header (hVary)
-import System.Directory (doesFileExist, createDirectoryIfMissing)
-import Data.ByteString.Builder (byteString)
-import qualified Data.ByteString.Builder.Extra as Blaze (flush)
-import Control.Exception (try, SomeException)
-import qualified Data.Set as Set
-import Network.Wai.Header
-import Network.Wai.Internal
+import           Control.Exception                 (SomeException, throwIO, try)
+import           Control.Monad                     (unless)
+import qualified Data.ByteString                   as S
+import           Data.ByteString.Builder           (byteString)
+import qualified Data.ByteString.Builder.Extra     as Blaze (flush)
+import qualified Data.ByteString.Char8             as S8
+import           Data.ByteString.Lazy.Internal     (defaultChunkSize)
+import           Data.Default.Class
+import           Data.Function                     (fix)
+import           Data.Maybe                        (fromMaybe, isJust)
+import qualified Data.Set                          as Set
 import qualified Data.Streaming.ByteString.Builder as B
-import qualified Data.Streaming.Zlib as Z
-import Control.Monad (unless)
-import Data.Function (fix)
-import Control.Exception (throwIO)
-import qualified System.IO as IO
-import Data.ByteString.Lazy.Internal (defaultChunkSize)
-import Data.Word8 (_semicolon, _space, _comma)
+import qualified Data.Streaming.Zlib               as Z
+import           Data.Word8                        (_comma, _semicolon, _space)
+import           Network.HTTP.Types                (Header, Status,
+                                                    hContentEncoding,
+                                                    hContentLength,
+                                                    hContentType, hUserAgent)
+import           Network.HTTP.Types.Header         (hVary)
+import           Network.Wai
+import           Network.Wai.Header
+import           Network.Wai.Internal
+import           System.Directory                  (createDirectoryIfMissing,
+                                                    doesFileExist)
+import qualified System.IO                         as IO
 
 data GzipSettings = GzipSettings
-    { gzipFiles :: GzipFiles
+    { gzipFiles     :: GzipFiles
     , gzipCheckMime :: S.ByteString -> Bool
     }
 
@@ -98,7 +101,7 @@ gzip set app env sendResponse' = app env $ \res ->
     case res of
         ResponseRaw{} -> sendResponse res
         ResponseFile{} | gzipFiles set == GzipIgnore -> sendResponse res
-        _ -> if "gzip" `elem` enc && not isMSIE6 && not (isEncoded res) && (bigEnough res)
+        _ -> if "gzip" `elem` enc && not isMSIE6 && not (isEncoded res) && bigEnough res
                 then
                     let runAction x = case x of
                             (ResponseFile s hs file Nothing, GzipPreCompressed nextAction) ->
@@ -107,8 +110,8 @@ gzip set app env sendResponse' = app env $ \res ->
                                  in
                                     doesFileExist compressedVersion >>= \y ->
                                        if y
-                                         then (sendResponse $ ResponseFile s (fixHeaders hs) compressedVersion Nothing)
-                                         else (runAction (ResponseFile s hs file Nothing, nextAction))
+                                         then sendResponse $ ResponseFile s (fixHeaders hs) compressedVersion Nothing
+                                         else runAction (ResponseFile s hs file Nothing, nextAction)
                             (ResponseFile s hs file Nothing, GzipCacheFolder cache) ->
                                 case lookup hContentType hs of
                                     Just m
@@ -121,14 +124,14 @@ gzip set app env sendResponse' = app env $ \res ->
   where
     sendResponse = sendResponse' . mapResponseHeaders (vary:)
     vary = (hVary, "Accept-Encoding")
-    enc = fromMaybe [] $ splitCommas
-                    `fmap` lookup "Accept-Encoding" (requestHeaders env)
+    enc = maybe
+      [] splitCommas (lookup "Accept-Encoding" (requestHeaders env))
     ua = fromMaybe "" $ lookup hUserAgent $ requestHeaders env
     isMSIE6 = "MSIE 6" `S.isInfixOf` ua
     isEncoded res = isJust $ lookup hContentEncoding $ responseHeaders res
 
     bigEnough rsp = case contentLength (responseHeaders rsp) of
-      Nothing -> True -- This could be a streaming case
+      Nothing  -> True -- This could be a streaming case
       Just len -> len >= minimumLength
 
     -- For a small enough response, gzipping will actually increase the size

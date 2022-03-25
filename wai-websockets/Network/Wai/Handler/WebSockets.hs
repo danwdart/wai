@@ -7,16 +7,16 @@ module Network.Wai.Handler.WebSockets
     , runWebSockets
     ) where
 
-import              Control.Exception               (bracket, tryJust)
-import              Data.ByteString                 (ByteString)
-import qualified    Data.ByteString.Char8           as BC
-import qualified    Data.ByteString.Lazy            as BL
-import qualified    Data.CaseInsensitive            as CI
-import              Network.HTTP.Types              (status500)
-import qualified    Network.Wai                     as Wai
-import qualified    Network.WebSockets              as WS
-import qualified    Network.WebSockets.Connection   as WS
-import qualified    Network.WebSockets.Stream       as WS
+import           Control.Exception             (bracket, tryJust)
+import           Data.ByteString               (ByteString)
+import qualified Data.ByteString.Char8         as BC
+import qualified Data.ByteString.Lazy          as BL
+import qualified Data.CaseInsensitive          as CI
+import           Network.HTTP.Types            (status500)
+import qualified Network.Wai                   as Wai
+import qualified Network.WebSockets            as WS
+import qualified Network.WebSockets.Connection as WS
+import qualified Network.WebSockets.Stream     as WS
 
 --------------------------------------------------------------------------------
 -- | Returns whether or not the given 'Wai.Request' is a WebSocket request.
@@ -57,7 +57,7 @@ websocketsOr :: WS.ConnectionOptions
              -> Wai.Application
 websocketsOr opts app backup req sendResponse =
     case websocketsApp opts app req of
-        Nothing -> backup req sendResponse
+        Nothing  -> backup req sendResponse
         Just res -> sendResponse res
 
 --------------------------------------------------------------------------------

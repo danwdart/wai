@@ -4,21 +4,21 @@ module WaiAppStatic.Storage.Embedded.Runtime
       embeddedSettings
     ) where
 
-import WaiAppStatic.Types
-import Data.ByteString (ByteString)
-import Control.Arrow ((&&&), second)
-import Data.List
-import Data.ByteString.Builder (byteString)
-import qualified Network.Wai as W
-import qualified Data.Map as Map
-import Data.Function (on)
-import qualified Data.Text as T
-import Data.Ord
-import qualified Data.ByteString as S
-import Crypto.Hash (hash, MD5, Digest)
-import Data.ByteArray.Encoding
-import WaiAppStatic.Storage.Filesystem (defaultFileServerSettings)
-import System.FilePath (isPathSeparator)
+import           Control.Arrow                   (second, (&&&))
+import           Crypto.Hash                     (Digest, MD5, hash)
+import           Data.ByteArray.Encoding
+import           Data.ByteString                 (ByteString)
+import qualified Data.ByteString                 as S
+import           Data.ByteString.Builder         (byteString)
+import           Data.Function                   (on)
+import           Data.List
+import qualified Data.Map                        as Map
+import           Data.Ord
+import qualified Data.Text                       as T
+import qualified Network.Wai                     as W
+import           System.FilePath                 (isPathSeparator)
+import           WaiAppStatic.Storage.Filesystem (defaultFileServerSettings)
+import           WaiAppStatic.Types
 
 -- | Serve the list of path/content pairs directly from memory.
 embeddedSettings :: [(Prelude.FilePath, ByteString)] -> StaticSettings
@@ -43,7 +43,7 @@ embeddedLookup root pieces =
             Just (EEFile f) ->
                 case ps of
                     [] -> LRFile $ bsToFile p f
-                    _ -> LRNotFound
+                    _  -> LRNotFound
             Just (EEFolder y) -> elookup ps y
 
 toEntry :: (Piece, EmbeddedEntry) -> Either FolderName File
@@ -82,7 +82,7 @@ toEmbedded fps =
 
     go' :: [(Pieces, ByteString)] -> EmbeddedEntry
     go' [([], content)] = EEFile content
-    go' x = EEFolder $ go $ filter (\y -> not $ null $ fst y) x
+    go' x               = EEFolder $ go $ filter (not . null . fst) x
 
 bsToFile :: Piece -> ByteString -> File
 bsToFile name bs = File

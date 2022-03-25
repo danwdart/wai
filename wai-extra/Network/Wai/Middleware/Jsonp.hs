@@ -1,4 +1,5 @@
-{-# LANGUAGE RankNTypes, CPP #-}
+{-# LANGUAGE CPP        #-}
+{-# LANGUAGE RankNTypes #-}
 ---------------------------------------------------------
 -- |
 -- Module        : Network.Wai.Middleware.Jsonp
@@ -14,19 +15,19 @@
 ---------------------------------------------------------
 module Network.Wai.Middleware.Jsonp (jsonp) where
 
-import Network.Wai
-import Network.Wai.Internal
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as B8
-import Data.ByteString.Builder.Extra (byteStringCopy)
-import Data.ByteString.Builder (char7)
+import           Data.ByteString               (ByteString)
+import           Data.ByteString.Builder       (char7)
+import           Data.ByteString.Builder.Extra (byteStringCopy)
+import qualified Data.ByteString.Char8         as B8
+import           Network.Wai
+import           Network.Wai.Internal
 #if __GLASGOW_HASKELL__ < 710
-import Data.Monoid (mappend)
+import           Data.Monoid                   (mappend)
 #endif
-import Control.Monad (join)
-import Data.Maybe (fromMaybe)
-import qualified Data.ByteString as S
-import Network.HTTP.Types (hAccept, hContentType)
+import           Control.Monad                 (join)
+import qualified Data.ByteString               as S
+import           Data.Maybe                    (fromMaybe)
+import           Network.HTTP.Types            (hAccept, hContentType)
 
 -- | Wrap json responses in a jsonp callback.
 --
@@ -54,7 +55,7 @@ jsonp app env sendResponse = do
     app env' $ \res ->
         case callback of
             Nothing -> sendResponse res
-            Just c -> go c res
+            Just c  -> go c res
   where
     go c r@(ResponseBuilder s hs b) =
         sendResponse $ case checkJSON hs of
@@ -67,7 +68,7 @@ jsonp app env sendResponse = do
     go c r =
         case checkJSON hs of
             Just hs' -> addCallback c s hs' wb
-            Nothing -> sendResponse r
+            Nothing  -> sendResponse r
       where
         (s, hs, wb) = responseToStream r
 

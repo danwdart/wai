@@ -1,12 +1,12 @@
 module Network.Wai.Test.Internal where
 
-import Network.Wai
-import qualified Control.Monad.Trans.State as ST
-import Control.Monad.Trans.Reader (ReaderT, runReaderT)
-import Data.Map (Map)
-import qualified Data.Map as Map
-import qualified Web.Cookie as Cookie
-import Data.ByteString (ByteString)
+import           Control.Monad.Trans.Reader (ReaderT, runReaderT)
+import qualified Control.Monad.Trans.State  as ST
+import           Data.ByteString            (ByteString)
+import           Data.Map                   (Map)
+import qualified Data.Map                   as Map
+import           Network.Wai
+import qualified Web.Cookie                 as Cookie
 
 type Session = ReaderT Application (ST.StateT ClientState IO)
 

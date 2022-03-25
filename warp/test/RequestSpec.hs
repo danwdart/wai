@@ -1,19 +1,20 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE StandaloneDeriving #-}
+
 
 module RequestSpec (main, spec) where
 
-import Network.Wai.Handler.Warp.File (parseByteRanges)
-import Network.Wai.Handler.Warp.Request
-import Network.Wai.Handler.Warp.Types
-import Network.Wai.Handler.Warp.Settings (settingsMaxTotalHeaderLength, defaultSettings)
-import Test.Hspec
-import Test.Hspec.QuickCheck
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as S8
-import qualified Network.HTTP.Types.Header as HH
-import Data.IORef
+import qualified Data.ByteString                   as S
+import qualified Data.ByteString.Char8             as S8
+import           Data.IORef
+import qualified Network.HTTP.Types.Header         as HH
+import           Network.Wai.Handler.Warp.File     (parseByteRanges)
+import           Network.Wai.Handler.Warp.Request
+import           Network.Wai.Handler.Warp.Settings (defaultSettings,
+                                                    settingsMaxTotalHeaderLength)
+import           Network.Wai.Handler.Warp.Types
+import           Test.Hspec
+import           Test.Hspec.QuickCheck
 
 main :: IO ()
 main = hspec spec

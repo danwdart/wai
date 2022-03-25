@@ -9,15 +9,15 @@ module Network.Wai.Handler.Warp.WithApplication (
 ) where
 
 import           Control.Concurrent
-import qualified UnliftIO
-import           UnliftIO.Async
-import           Control.Monad (when)
-import           Data.Streaming.Network (bindRandomPortTCP)
+import           Control.Monad                     (when)
+import           Data.Streaming.Network            (bindRandomPortTCP)
 import           Network.Socket
 import           Network.Wai
 import           Network.Wai.Handler.Warp.Run
 import           Network.Wai.Handler.Warp.Settings
 import           Network.Wai.Handler.Warp.Types
+import qualified UnliftIO
+import           UnliftIO.Async
 
 -- | Runs the given 'Application' on a free port. Passes the port to the given
 -- operation and executes it, while the 'Application' is running. Shuts down the
@@ -81,7 +81,7 @@ testWithApplicationSettings settings mkApp action = do
 
 data Waiter a
   = Waiter {
-    notify :: a -> IO (),
+    notify  :: a -> IO (),
     waitFor :: IO a
   }
 

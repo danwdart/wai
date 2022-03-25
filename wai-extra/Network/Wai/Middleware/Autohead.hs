@@ -3,9 +3,9 @@
 -- applications GET response.
 module Network.Wai.Middleware.Autohead (autohead) where
 
-import Network.Wai
+import           Network.Wai
 #if __GLASGOW_HASKELL__ < 710
-import Data.Monoid (mempty)
+import           Data.Monoid (mempty)
 #endif
 
 autohead :: Middleware

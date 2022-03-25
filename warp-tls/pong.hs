@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai
-import Network.Wai.Handler.Warp (defaultSettings, setPort)
-import Network.Wai.Handler.WarpTLS
-import Network.HTTP.Types (status200)
-import Blaze.ByteString.Builder (copyByteString)
-import Data.Monoid
-import qualified Data.Conduit as C
-import qualified Data.Conduit.List as CL
-import Network.HTTP.ReverseProxy
-import Network.HTTP.Conduit
+import           Blaze.ByteString.Builder    (copyByteString)
+import qualified Data.Conduit                as C
+import qualified Data.Conduit.List           as CL
+import           Data.Monoid
+import           Network.HTTP.Conduit
+import           Network.HTTP.ReverseProxy
+import           Network.HTTP.Types          (status200)
+import           Network.Wai
+import           Network.Wai.Handler.Warp    (defaultSettings, setPort)
+import           Network.Wai.Handler.WarpTLS
 
 main = do
     putStrLn "https://localhost:3009/"

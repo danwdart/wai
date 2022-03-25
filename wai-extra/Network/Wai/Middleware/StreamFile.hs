@@ -4,12 +4,12 @@
 module Network.Wai.Middleware.StreamFile
     (streamFile) where
 
-import Network.Wai (responseStream)
-import Network.Wai.Internal
-import Network.Wai (Middleware, responseToStream)
 import qualified Data.ByteString.Char8 as S8
-import System.Directory (getFileSize)
-import Network.HTTP.Types (hContentLength)
+import           Network.HTTP.Types    (hContentLength)
+import           Network.Wai           (Middleware, responseStream,
+                                        responseToStream)
+import           Network.Wai.Internal
+import           System.Directory      (getFileSize)
 
 -- |Convert ResponseFile type responses into ResponseStream type
 --
@@ -33,6 +33,6 @@ streamFile app env sendResponse = app env $ \res ->
             sendBody :: StreamingBody -> IO ResponseReceived
             sendBody body = do
                len <- getFileSize fp
-               let hs' = (hContentLength, (S8.pack (show len))) : hs
+               let hs' = (hContentLength, S8.pack (show len)) : hs
                sendResponse $ responseStream s hs' body
       _ -> sendResponse res

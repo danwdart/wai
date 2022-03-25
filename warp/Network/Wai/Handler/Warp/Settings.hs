@@ -1,32 +1,38 @@
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, ViewPatterns #-}
-{-# LANGUAGE PatternGuards, RankNTypes #-}
-{-# LANGUAGE ImpredicativeTypes, CPP #-}
-{-# LANGUAGE MagicHash, UnboxedTuples #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE ImpredicativeTypes  #-}
+{-# LANGUAGE MagicHash           #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UnboxedTuples       #-}
+{-# LANGUAGE ViewPatterns        #-}
 
 module Network.Wai.Handler.Warp.Settings where
 
-import GHC.IO (unsafeUnmask, IO (IO))
-import GHC.Prim (fork#)
-import UnliftIO (SomeException, fromException)
-import qualified Data.ByteString.Char8 as C8
-import qualified Data.ByteString.Builder as Builder
-import Data.ByteString.Lazy (fromStrict)
-import Data.Streaming.Network (HostPreference)
-import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import Data.Version (showVersion)
-import GHC.IO.Exception (IOErrorType(..), AsyncException (ThreadKilled))
-import qualified Network.HTTP.Types as H
-import Network.HTTP2.Frame (HTTP2Error (..), ErrorCodeId (..))
-import Network.Socket (SockAddr)
-import Network.Wai
+import qualified Data.ByteString.Builder          as Builder
+import qualified Data.ByteString.Char8            as C8
+import           Data.ByteString.Lazy             (fromStrict)
+import           Data.Streaming.Network           (HostPreference)
+import qualified Data.Text                        as T
+import qualified Data.Text.IO                     as TIO
+import           Data.Version                     (showVersion)
+import           GHC.IO                           (IO (IO), unsafeUnmask)
+import           GHC.IO.Exception                 (AsyncException (ThreadKilled),
+                                                   IOErrorType (..))
+import           GHC.Prim                         (fork#)
+import qualified Network.HTTP.Types               as H
+import           Network.HTTP2.Frame              (ErrorCodeId (..),
+                                                   HTTP2Error (..))
+import           Network.Socket                   (SockAddr)
+import           Network.Wai
 import qualified Paths_warp
-import System.IO (stderr)
-import System.IO.Error (ioeGetErrorType)
-import System.TimeManager
+import           System.IO                        (stderr)
+import           System.IO.Error                  (ioeGetErrorType)
+import           System.TimeManager
+import           UnliftIO                         (SomeException, fromException)
 
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 -- | Various Warp server settings. This is purposely kept as an abstract data
 -- type so that new settings can be added without breaking backwards
@@ -250,6 +256,6 @@ exceptionResponseForDebug e =
 defaultFork :: ((forall a. IO a -> IO a) -> IO ()) -> IO ()
 defaultFork io =
   IO $ \s0 ->
-    case (fork# (io unsafeUnmask) s0) of
+    case fork# (io unsafeUnmask) s0 of
       (# s1, _tid #) ->
         (# s1, () #)

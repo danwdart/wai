@@ -1,33 +1,34 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module RunSpec (main, spec, withApp, MySocket, msWrite, msRead, withMySocket) where
 
-import Control.Concurrent (forkIO, killThread, threadDelay)
-import Control.Concurrent.MVar (newEmptyMVar, takeMVar, putMVar)
-import Control.Concurrent.STM
-import qualified UnliftIO.Exception as E
-import UnliftIO.Exception (bracket, try, IOException, onException)
-import Control.Monad (forM_, replicateM_, unless)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as S
-import Data.ByteString.Builder (byteString)
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString.Lazy as L
-import qualified Data.IORef as I
-import Data.Streaming.Network (bindPortTCP, getSocketTCP, safeRecv)
-import Network.HTTP.Types
-import Network.Socket
-import Network.Socket.ByteString (sendAll)
-import Network.Wai hiding (responseHeaders)
-import Network.Wai.Internal (getRequestBodyChunk)
-import Network.Wai.Handler.Warp
-import System.IO.Unsafe (unsafePerformIO)
-import System.Timeout (timeout)
-import Test.Hspec
+import           Control.Concurrent        (forkIO, killThread, threadDelay)
+import           Control.Concurrent.MVar   (newEmptyMVar, putMVar, takeMVar)
+import           Control.Concurrent.STM
+import           Control.Monad             (forM_, replicateM_, unless)
+import           Control.Monad.IO.Class    (MonadIO, liftIO)
+import           Data.ByteString           (ByteString)
+import qualified Data.ByteString           as S
+import           Data.ByteString.Builder   (byteString)
+import qualified Data.ByteString.Char8     as S8
+import qualified Data.ByteString.Lazy      as L
+import qualified Data.IORef                as I
+import           Data.Streaming.Network    (bindPortTCP, getSocketTCP, safeRecv)
+import           Network.HTTP.Types
+import           Network.Socket
+import           Network.Socket.ByteString (sendAll)
+import           Network.Wai               hiding (responseHeaders)
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Internal      (getRequestBodyChunk)
+import           System.IO.Unsafe          (unsafePerformIO)
+import           System.Timeout            (timeout)
+import           Test.Hspec
+import           UnliftIO.Exception        (IOException, bracket, onException,
+                                            try)
+import qualified UnliftIO.Exception        as E
 
-import HTTP
+import           HTTP
 
 main :: IO ()
 main = hspec spec
@@ -41,7 +42,7 @@ data MySocket = MySocket
   }
 
 msWrite :: MySocket -> ByteString -> IO ()
-msWrite ms bs = sendAll (msSocket ms) bs
+msWrite ms = sendAll (msSocket ms)
 
 msRead :: MySocket -> Int -> IO ByteString
 msRead (MySocket s ref) expected = do
@@ -83,9 +84,9 @@ withMySocket body port = bracket (connectTo port) msClose body
 
 incr :: MonadIO m => Counter -> m ()
 incr icount = liftIO $ I.atomicModifyIORef icount $ \ecount ->
-    ((case ecount of
-        Left s -> Left s
-        Right i -> Right $ i + 1), ())
+    (case ecount of
+       Left s  -> Left s
+       Right i -> Right $ i + 1, ())
 
 err :: (MonadIO m, Show a) => Counter -> a -> m ()
 err icount msg = liftIO $ I.writeIORef icount $ Left $ show msg
@@ -99,14 +100,14 @@ readBody icount req f = do
                 -> err icount ("Invalid hello" :: String, body)
             | requestMethod req == "GET" && L.fromChunks body /= ""
                 -> err icount ("Invalid GET" :: String, body)
-            | not $ requestMethod req `elem` ["GET", "POST"]
+            | notElem (requestMethod req) ["GET", "POST"]
                 -> err icount ("Invalid request method (readBody)" :: String, requestMethod req)
             | otherwise -> incr icount
     f $ responseLBS status200 [] "Read the body"
 
 ignoreBody :: CounterApplication
 ignoreBody icount req f = do
-    if (requestMethod req `elem` ["GET", "POST"])
+    if requestMethod req `elem` ["GET", "POST"]
         then incr icount
         else err icount ("Invalid request method" :: String, requestMethod req)
     f $ responseLBS status200 [] "Ignored the body"
@@ -149,7 +150,7 @@ withApp settings app f = do
             mres <- timeout (60 * 1000 * 1000) (f port)
             case mres of
               Nothing -> error "Timeout triggered, too slow!"
-              Just a -> pure a)
+              Just a  -> pure a)
 
 runTest :: Int -- ^ expected number of requests
         -> CounterApplication
@@ -162,7 +163,7 @@ runTest expected app chunks = do
         _ <- timeout 100000 $ replicateM_ expected $ msRead ms 4096
         res <- I.readIORef ref
         case res of
-            Left s -> error s
+            Left s  -> error s
             Right i -> i `shouldBe` expected
 
 dummyApp :: Application
@@ -206,14 +207,8 @@ spec = do
             [ singlePostHello
             , singleGet
             ]
-        it "chunked body, read" $ runTest 2 readBody $ concat
-            [ singleChunkedPostHello
-            , [singleGet]
-            ]
-        it "chunked body, ignore" $ runTest 2 ignoreBody $ concat
-            [ singleChunkedPostHello
-            , [singleGet]
-            ]
+        it "chunked body, read" $ runTest 2 readBody $ singleChunkedPostHello ++ [singleGet]
+        it "chunked body, ignore" $ runTest 2 ignoreBody $ singleChunkedPostHello ++ [singleGet]
     describe "pipelining" $ do
         it "no body, read" $ runTest 5 readBody [S.concat $ replicate 5 singleGet]
         it "no body, ignore" $ runTest 5 ignoreBody [S.concat $ replicate 5 singleGet]
@@ -309,7 +304,7 @@ spec = do
             withApp defaultSettings app $ withMySocket $ \ms -> do
                 let input = concat $ replicate 2 $
                         ["POST / HTTP/1.1\r\nTransfer-Encoding: Chunked\r\n\r\n"] ++
-                        (replicate 50 "5\r\n12345\r\n") ++
+                        replicate 50 "5\r\n12345\r\n" ++
                         ["0\r\n\r\n"]
                 mapM_ (msWrite ms) input
                 atomically $ do
@@ -334,7 +329,7 @@ spec = do
                         , "POST / HTTP/1.1\r\nTransfer-Encoding: Chunked\r\n\r\n"
                         , "b\r\nHello World\r\n0\r\n\r\n"
                         ]
-                mapM_ (msWrite ms) $ map S.singleton $ S.unpack input
+                mapM_ ((msWrite ms) . S.singleton) (S.unpack input)
                 atomically $ do
                   count <- readTVar countVar
                   check $ count == 2
@@ -346,7 +341,7 @@ spec = do
         it "timeout in request body" $ do
             ifront <- I.newIORef id
             let app req f = do
-                    bss <- (consumeBody $ getRequestBodyChunk req) `onException`
+                    bss <- consumeBody (getRequestBodyChunk req) `onException`
                         liftIO (I.atomicModifyIORef ifront (\front -> (front . ("consume interrupted":), ())))
                     liftIO $ threadDelay 4000000 `E.catch` \e -> do
                         I.atomicModifyIORef ifront (\front ->

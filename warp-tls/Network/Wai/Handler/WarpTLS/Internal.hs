@@ -8,18 +8,18 @@ module Network.Wai.Handler.WarpTLS.Internal (
     , getCertSettings
     ) where
 
-import qualified Crypto.PubKey.DH as DH
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import qualified Data.IORef as I
-import qualified Network.TLS as TLS
+import qualified Crypto.PubKey.DH           as DH
+import qualified Data.ByteString            as S
+import qualified Data.ByteString.Lazy       as L
+import qualified Data.IORef                 as I
+import qualified Network.TLS                as TLS
 import qualified Network.TLS.SessionManager as SM
 
 ----------------------------------------------------------------
 
--- | Determines where to load the certificate, chain 
+-- | Determines where to load the certificate, chain
 -- certificates, and key from.
-data CertSettings 
+data CertSettings
   = CertFromFile !FilePath ![FilePath] !FilePath
   | CertFromMemory !S.ByteString ![S.ByteString] !S.ByteString
   | CertFromRef !(I.IORef S.ByteString) ![I.IORef S.ByteString] !(I.IORef S.ByteString)
@@ -35,28 +35,28 @@ data OnInsecure = DenyInsecure L.ByteString
 
 -- | Settings for WarpTLS.
 data TLSSettings = TLSSettings {
-    certSettings :: CertSettings
+    certSettings            :: CertSettings
     -- ^ Where are the certificate, chain certificates, and key
     -- loaded from?
     --
     -- >>> certSettings defaultTlsSettings
     -- tlsSettings "certificate.pem" "key.pem"
-    -- 
+    --
     -- @since 3.3.0
-  , onInsecure :: OnInsecure
+  , onInsecure              :: OnInsecure
     -- ^ Do we allow insecure connections with this server as well?
     --
     -- >>> onInsecure defaultTlsSettings
     -- DenyInsecure "This server only accepts secure HTTPS connections."
     --
     -- Since 1.4.0
-  , tlsLogging :: TLS.Logging
+  , tlsLogging              :: TLS.Logging
     -- ^ The level of logging to turn on.
     --
     -- Default: 'TLS.defaultLogging'.
     --
     -- Since 1.4.0
-  , tlsAllowedVersions :: [TLS.Version]
+  , tlsAllowedVersions      :: [TLS.Version]
 #if MIN_VERSION_tls(1,5,0)
     -- ^ The TLS versions this server accepts.
     --
@@ -72,7 +72,7 @@ data TLSSettings = TLSSettings {
     --
     -- Since 1.4.2
 #endif
-  , tlsCiphers :: [TLS.Cipher]
+  , tlsCiphers              :: [TLS.Cipher]
 #if MIN_VERSION_tls(1,5,0)
     -- ^ The TLS ciphers this server accepts.
     --
@@ -88,7 +88,7 @@ data TLSSettings = TLSSettings {
     --
     -- Since 1.4.2
 #endif
-  , tlsWantClientCert :: Bool
+  , tlsWantClientCert       :: Bool
     -- ^ Whether or not to demand a certificate from the client.  If this
     -- is set to True, you must handle received certificates in a server hook
     -- or all connections will fail.
@@ -97,7 +97,7 @@ data TLSSettings = TLSSettings {
     -- False
     --
     -- Since 3.0.2
-  , tlsServerHooks :: TLS.ServerHooks
+  , tlsServerHooks          :: TLS.ServerHooks
     -- ^ The server-side hooks called by the tls package, including actions
     -- to take when a client certificate is received.  See the "Network.TLS"
     -- module for details.
@@ -105,7 +105,7 @@ data TLSSettings = TLSSettings {
     -- Default: def
     --
     -- Since 3.0.2
-  , tlsServerDHEParams :: Maybe DH.Params
+  , tlsServerDHEParams      :: Maybe DH.Params
     -- ^ Configuration for ServerDHEParams
     -- more function lives in `cryptonite` package
     --
@@ -121,12 +121,12 @@ data TLSSettings = TLSSettings {
     -- Default: Nothing
     --
     -- Since 3.2.4
-  , tlsCredentials :: Maybe TLS.Credentials
+  , tlsCredentials          :: Maybe TLS.Credentials
     -- ^ Specifying 'TLS.Credentials' directly.  If this value is
     --   specified, other fields such as 'certFile' are ignored.
     --
     --   Since 3.2.12
-  , tlsSessionManager :: Maybe TLS.SessionManager
+  , tlsSessionManager       :: Maybe TLS.SessionManager
     -- ^ Specifying 'TLS.SessionManager' directly. If this value is
     --   specified, 'tlsSessionManagerConfig' is ignored.
     --

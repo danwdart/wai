@@ -1,12 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module ConduitSpec (main, spec) where
 
-import Network.Wai.Handler.Warp.Conduit
-import Network.Wai.Handler.Warp.Types
-import Control.Monad (replicateM)
-import Test.Hspec
-import Data.IORef as I
-import qualified Data.ByteString as S
+import           Control.Monad                    (replicateM)
+import qualified Data.ByteString                  as S
+import           Data.IORef                       as I
+import           Network.Wai.Handler.Warp.Conduit
+import           Network.Wai.Handler.Warp.Types
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -32,7 +32,7 @@ spec = describe "conduit" $ do
         z <- replicateM 40 $ readSource src
         S.concat z `shouldBe` S.pack [41..50]
     it "chunkedSource" $ do
-        ref <- newIORef $ "5\r\n12345\r\n3\r\n678\r\n0\r\n\r\nBLAH"
+        ref <- newIORef "5\r\n12345\r\n3\r\n678\r\n0\r\n\r\nBLAH"
         src <- mkSource $ do
             x <- readIORef ref
             writeIORef ref S.empty

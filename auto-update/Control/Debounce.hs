@@ -38,7 +38,7 @@ module Control.Debounce
     , mkDebounce
     ) where
 
-import           Control.Concurrent      (newEmptyMVar, threadDelay)
+import           Control.Concurrent        (newEmptyMVar, threadDelay)
 import qualified Control.Debounce.Internal as DI
 
 -- | Default value for creating a 'DebounceSettings'.

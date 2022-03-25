@@ -1,5 +1,5 @@
+{-# LANGUAGE CPP           #-}
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE CPP #-}
 
 module Network.Wai.Middleware.Rewrite
     ( -- * How to use this module
@@ -39,17 +39,17 @@ module Network.Wai.Middleware.Rewrite
     , rewriteRequestPure
     ) where
 
-import Network.Wai
-import Control.Monad.IO.Class (liftIO)
-import Data.Text (Text)
-import Data.Functor.Identity (Identity(..))
-import qualified Data.Text.Encoding as TE
-import qualified Data.Text as T
-import Network.HTTP.Types as H
+import           Control.Monad.IO.Class (liftIO)
+import           Data.Functor.Identity  (Identity (..))
+import           Data.Text              (Text)
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import           Network.HTTP.Types     as H
+import           Network.Wai
 
 -- GHC ≤ 7.10 does not export Applicative functions from the prelude.
 #if __GLASGOW_HASKELL__ <= 710
-import Control.Applicative
+import           Control.Applicative
 #endif
 
 -- $howto
@@ -277,7 +277,7 @@ rewriteRoot :: Text -> Middleware
 rewriteRoot root = rewritePureWithQueries onlyRoot
   where
     onlyRoot ([], q) _ = ([root], q)
-    onlyRoot paths _ = paths
+    onlyRoot paths _   = paths
 
 --------------------------------------------------
 -- * Modifying 'Request's directly

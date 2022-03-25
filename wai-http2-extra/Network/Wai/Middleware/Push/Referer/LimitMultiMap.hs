@@ -2,10 +2,10 @@
 
 module Network.Wai.Middleware.Push.Referer.LimitMultiMap where
 
-import Data.Map (Map)
+import           Data.Map        (Map)
 import qualified Data.Map.Strict as M
-import Data.Set (Set)
-import qualified Data.Set as S
+import           Data.Set        (Set)
+import qualified Data.Set        as S
 
 data LimitMultiMap k v = LimitMultiMap {
       limitKey :: !Int
@@ -35,6 +35,4 @@ insert (k,v) (LimitMultiMap lk lv m)
       | otherwise        = S.insert v set
 
 lookup :: Ord k => k -> LimitMultiMap k v -> [v]
-lookup k (LimitMultiMap _ _ m) = case M.lookup k m of
-  Nothing  -> []
-  Just set -> S.toList set
+lookup k (LimitMultiMap _ _ m) = maybe [] S.toList (M.lookup k m)

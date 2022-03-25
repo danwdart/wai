@@ -1,41 +1,47 @@
-{-# LANGUAGE DeriveDataTypeable, RecordWildCards, CPP #-}
+{-# LANGUAGE CPP                #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE RecordWildCards    #-}
 -- | Command line version of wai-app-static, used for the warp-static server.
 module WaiAppStatic.CmdLine
     ( runCommandLine
     , Args (..)
     ) where
 
-import Network.Wai (Middleware)
-import Network.Wai.Application.Static (staticApp, defaultFileServerSettings)
-import Network.Wai.Handler.Warp
-    ( runSettings, defaultSettings, setHost, setPort
-    )
-import Options.Applicative
-import Text.Printf (printf)
-import System.Directory (canonicalizePath)
-import Control.Monad (unless)
-import Network.Wai.Middleware.RequestLogger (logStdout)
-import Network.Wai.Middleware.Gzip
-import qualified Data.Map as Map
-import qualified Data.ByteString.Char8 as S8
-import Control.Arrow ((***))
-import Data.Text (pack)
-import Data.String (fromString)
-import Network.Mime (defaultMimeMap, mimeByExt, defaultMimeType)
-import WaiAppStatic.Types (ssIndices, toPiece, ssGetMimeType, fileName, fromPiece)
-import Data.Maybe (mapMaybe)
-import Control.Arrow (second)
-import Data.Monoid ((<>))
+import           Control.Arrow                        (second, (***))
+import           Control.Monad                        (unless)
+import qualified Data.ByteString.Char8                as S8
+import qualified Data.Map                             as Map
+import           Data.Maybe                           (mapMaybe)
+import           Data.Monoid                          ((<>))
+import           Data.String                          (fromString)
+import           Data.Text                            (pack)
+import           Network.Mime                         (defaultMimeMap,
+                                                       defaultMimeType,
+                                                       mimeByExt)
+import           Network.Wai                          (Middleware)
+import           Network.Wai.Application.Static       (defaultFileServerSettings,
+                                                       staticApp)
+import           Network.Wai.Handler.Warp             (defaultSettings,
+                                                       runSettings, setHost,
+                                                       setPort)
+import           Network.Wai.Middleware.Gzip
+import           Network.Wai.Middleware.RequestLogger (logStdout)
+import           Options.Applicative
+import           System.Directory                     (canonicalizePath)
+import           Text.Printf                          (printf)
+import           WaiAppStatic.Types                   (fileName, fromPiece,
+                                                       ssGetMimeType, ssIndices,
+                                                       toPiece)
 
 data Args = Args
     { docroot :: FilePath
-    , index :: [FilePath]
-    , port :: Int
+    , index   :: [FilePath]
+    , port    :: Int
     , noindex :: Bool
-    , quiet :: Bool
+    , quiet   :: Bool
     , verbose :: Bool
-    , mime :: [(String, String)]
-    , host :: String
+    , mime    :: [(String, String)]
+    , host    :: String
     }
 
 #if MIN_VERSION_optparse_applicative(0, 10, 0)
@@ -87,7 +93,7 @@ args = Args
   where
     toPair = second (drop 1) . break (== '=')
     defIndex [] = ["index.html", "index.htm"]
-    defIndex x = x
+    defIndex x  = x
 
 -- | Run with the given middleware and parsing options from the command line.
 --

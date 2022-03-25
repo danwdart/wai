@@ -1,22 +1,23 @@
-{-# LANGUAGE OverloadedStrings, CPP #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module ExceptionSpec (main, spec) where
 
 #if __GLASGOW_HASKELL__ < 709
-import Control.Applicative
+import           Control.Applicative
 #endif
-import Control.Monad
-import Network.HTTP.Types hiding (Header)
-import Network.Wai hiding (Response, responseStatus)
-import Network.Wai.Internal (Request(..))
-import Network.Wai.Handler.Warp
-import Test.Hspec
-import UnliftIO.Exception
-import qualified Data.Streaming.Network as N
-import UnliftIO.Async (withAsync)
-import Network.Socket (close)
+import           Control.Monad
+import qualified Data.Streaming.Network   as N
+import           Network.HTTP.Types       hiding (Header)
+import           Network.Socket           (close)
+import           Network.Wai              hiding (Response, responseStatus)
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Internal     (Request (..))
+import           Test.Hspec
+import           UnliftIO.Async           (withAsync)
+import           UnliftIO.Exception
 
-import HTTP
+import           HTTP
 
 main :: IO ()
 main = hspec spec
@@ -30,7 +31,7 @@ withTestServer inner = bracket
             $ \_ -> inner prt
 
 testApp :: Application
-testApp (Network.Wai.Internal.Request {pathInfo = [x]}) f
+testApp Network.Wai.Internal.Request {pathInfo = [x]} f
     | x == "statusError" =
         f $ responseLBS undefined [] "foo"
     | x == "headersError" =

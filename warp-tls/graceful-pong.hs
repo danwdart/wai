@@ -1,19 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Control.Concurrent
-import UnliftIO.Async
-import Network
-import Network.Wai
-import Network.Wai.Handler.Warp (defaultSettings)
-import Network.Wai.Handler.WarpTLS
-import Network.HTTP.Types (status200)
-import Network.Socket (Socket(..), mkSocket, SocketStatus(..))
-import Blaze.ByteString.Builder (copyByteString)
-import Data.Monoid
-import qualified Data.Conduit as C
-import qualified Data.Conduit.List as CL
-import System.Environment (getEnv)
-import System.Posix.Process
-import System.Posix.Signals
+import           Blaze.ByteString.Builder    (copyByteString)
+import           Control.Concurrent
+import qualified Data.Conduit                as C
+import qualified Data.Conduit.List           as CL
+import           Data.Monoid
+import           Network
+import           Network.HTTP.Types          (status200)
+import           Network.Socket              (Socket (..), SocketStatus (..),
+                                              mkSocket)
+import           Network.Wai
+import           Network.Wai.Handler.Warp    (defaultSettings)
+import           Network.Wai.Handler.WarpTLS
+import           System.Environment          (getEnv)
+import           System.Posix.Process
+import           System.Posix.Signals
+import           UnliftIO.Async
 
 envSocketName = "GRACEFUL_PONG_SOCKET"
 
@@ -66,12 +67,12 @@ main = do
 app req = return $
     case rawPathInfo req of
         "/builder/withlen" -> builderWithLen
-        "/builder/nolen" -> builderNoLen
-        "/file/withlen" -> fileWithLen
-        "/file/nolen" -> fileNoLen
-        "/source/withlen" -> sourceWithLen
-        "/source/nolen" -> sourceNoLen
-        x -> index x
+        "/builder/nolen"   -> builderNoLen
+        "/file/withlen"    -> fileWithLen
+        "/file/nolen"      -> fileNoLen
+        "/source/withlen"  -> sourceWithLen
+        "/source/nolen"    -> sourceNoLen
+        x                  -> index x
 
 builderWithLen = ResponseBuilder
     status200

@@ -1,22 +1,23 @@
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 module Network.Wai.Handler.Warp.Types where
 
+import qualified Data.ByteString                        as S
+import           Data.IORef                             (IORef, newIORef,
+                                                         readIORef, writeIORef)
+import           Data.Typeable                          (Typeable)
+import           Data.X509
+import           Foreign.Ptr                            (Ptr)
+import           System.Posix.Types                     (Fd)
+import qualified System.TimeManager                     as T
 import qualified UnliftIO
-import qualified Data.ByteString as S
-import Data.IORef (IORef, readIORef, writeIORef, newIORef)
-import Data.Typeable (Typeable)
-import Data.X509
-import Foreign.Ptr (Ptr)
-import System.Posix.Types (Fd)
-import qualified System.TimeManager as T
 
-import qualified Network.Wai.Handler.Warp.Date as D
-import qualified Network.Wai.Handler.Warp.FdCache as F
+import qualified Network.Wai.Handler.Warp.Date          as D
+import qualified Network.Wai.Handler.Warp.FdCache       as F
 import qualified Network.Wai.Handler.Warp.FileInfoCache as I
-import Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Imports
 
 ----------------------------------------------------------------
 
@@ -131,7 +132,7 @@ getConnHTTP2 :: Connection -> IO Bool
 getConnHTTP2 conn = readIORef (connHTTP2 conn)
 
 setConnHTTP2 :: Connection -> Bool -> IO ()
-setConnHTTP2 conn b = writeIORef (connHTTP2 conn) b
+setConnHTTP2 conn = writeIORef (connHTTP2 conn)
 
 ----------------------------------------------------------------
 
@@ -166,7 +167,7 @@ readSource' :: Source -> IO ByteString
 readSource' (Source _ func) = func
 
 leftoverSource :: Source -> ByteString -> IO ()
-leftoverSource (Source ref _) bs = writeIORef ref bs
+leftoverSource (Source ref _) = writeIORef ref
 
 readLeftoverSource :: Source -> IO ByteString
 readLeftoverSource (Source ref _) = readIORef ref
@@ -176,16 +177,16 @@ readLeftoverSource (Source ref _) = readIORef ref
 -- | What kind of transport is used for this connection?
 data Transport = TCP -- ^ Plain channel: TCP
                | TLS {
-                   tlsMajorVersion :: Int
-                 , tlsMinorVersion :: Int
+                   tlsMajorVersion       :: Int
+                 , tlsMinorVersion       :: Int
                  , tlsNegotiatedProtocol :: Maybe ByteString -- ^ The result of Application Layer Protocol Negociation in RFC 7301
-                 , tlsChiperID :: Word16
-                 , tlsClientCertificate :: Maybe CertificateChain
+                 , tlsChiperID           :: Word16
+                 , tlsClientCertificate  :: Maybe CertificateChain
                  }  -- ^ Encrypted channel: TLS or SSL
                | QUIC {
                    quicNegotiatedProtocol :: Maybe ByteString
-                 , quicChiperID :: Word16
-                 , quicClientCertificate :: Maybe CertificateChain
+                 , quicChiperID           :: Word16
+                 , quicClientCertificate  :: Maybe CertificateChain
                  }
 
 isTransportSecure :: Transport -> Bool

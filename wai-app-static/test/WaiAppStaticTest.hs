@@ -1,27 +1,29 @@
-{-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE OverloadedStrings         #-}
 module WaiAppStaticTest (spec) where
 
-import Network.Wai.Application.Static
-import WaiAppStatic.Types
+import           Network.Wai.Application.Static
+import           WaiAppStatic.Types
 
-import Test.Hspec
-import Test.Mockery.Directory
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.ByteString.Char8          as S8
+import           Test.Hspec
+import           Test.Mockery.Directory
 -- import qualified Data.ByteString.Lazy.Char8 as L8
-import System.PosixCompat.Files (getFileStatus, modificationTime)
-import System.FilePath
-import System.IO.Temp
+import           System.FilePath
+import           System.IO.Temp
+import           System.PosixCompat.Files       (getFileStatus,
+                                                 modificationTime)
 
-import Network.HTTP.Date
-import Network.HTTP.Types (status500)
+import           Network.HTTP.Date
+import           Network.HTTP.Types             (status500)
 {-import System.Locale (defaultTimeLocale)-}
 {-import Data.Time.Format (formatTime)-}
 
-import Network.Wai
-import Network.Wai.Test
+import           Network.Wai
+import           Network.Wai.Test
 
-import Control.Monad.IO.Class (liftIO)
-import Network.Mime
+import           Control.Monad.IO.Class         (liftIO)
+import           Network.Mime
 
 defRequest :: Request
 defRequest = defaultRequest
@@ -48,12 +50,12 @@ spec = do
 
   describe "webApp" $ do
     it "403 for unsafe paths" $ webApp $
-      flip mapM_ ["..", "."] $ \path ->
+      Control.Monad.forM_ ["..", "."] $ \path ->
         assertStatus 403 =<<
           request (setRawPathInfo defRequest path)
 
     it "200 for hidden paths" $ webApp $
-      flip mapM_ [".hidden/folder.png", ".hidden/haskell.png"] $ \path ->
+      Control.Monad.forM_ [".hidden/folder.png", ".hidden/haskell.png"] $ \path ->
         assertStatus 200 =<<
           request (setRawPathInfo defRequest path)
 
@@ -70,7 +72,7 @@ spec = do
           ssMkRedirect = \_ u -> S8.append "http://www.example.com" u
         }
     it "302 redirect when multiple slashes" $ absoluteApp $
-      flip mapM_ ["/a//b/c", "a//b/c"] $ \path -> do
+      Control.Monad.forM_ ["/a//b/c", "a//b/c"] $ \path -> do
         req <- request (setRawPathInfo defRequest path)
         assertStatus 302 req
         assertHeader "Location" "http://www.example.com/a/b/c" req
@@ -89,7 +91,7 @@ spec = do
       assertNoHeader "Last-Modified" req
 
     it "200 when invalid in-none-match sent" $ webApp $
-      flip mapM_ ["cached", ""] $ \badETag -> do
+      Control.Monad.forM_ ["cached", ""] $ \badETag -> do
         req <- request statFile { requestHeaders  = [("If-None-Match", badETag)] }
         assertStatus 200 req
         assertHeader "ETag" etag req
@@ -115,7 +117,7 @@ spec = do
       assertBodyContains "<a href=\"b\">b</a>" resp
 
     it "200 when invalid if-modified-since header" $ fileServerApp $ do
-      flip mapM_ ["123", ""] $ \badDate -> do
+      Control.Monad.forM_ ["123", ""] $ \badDate -> do
         req <- request statFile {
           requestHeaders = [("If-Modified-Since", badDate)]
         }
@@ -151,9 +153,9 @@ spec = do
             case pathInfo req of
                 "subPath":rest ->
                     let req' = req { pathInfo = rest }
-                     in (staticApp (defaultFileServerSettings "test")
+                     in staticApp (defaultFileServerSettings "test")
                             { ssAddTrailingSlash = True
-                            }) req' send
+                            } req' send
                 _ -> send $ responseLBS status500 []
                     "urlMapApp: only works at subPath"
       it "works with subpath at the root of the file server" $ urlMapApp $ do

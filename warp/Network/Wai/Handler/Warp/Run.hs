@@ -1,52 +1,58 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BangPatterns        #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections       #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 module Network.Wai.Handler.Warp.Run where
 
-import Control.Arrow (first)
-import Control.Exception (allowInterrupt)
+import           Control.Arrow                          (first)
+import           Control.Exception                      (allowInterrupt)
 import qualified Control.Exception
+import qualified Data.ByteString                        as S
+import           Data.IORef                             (newIORef, readIORef)
+import           Data.Streaming.Network                 (bindPortTCP)
+import           Foreign.C.Error                        (Errno (..),
+                                                         eCONNABORTED)
+import           GHC.IO.Exception                       (IOErrorType (..),
+                                                         IOException (..))
+import           Network.Socket                         (SockAddr, Socket,
+                                                         SocketOption (..),
+                                                         accept, close,
+                                                         setSocketOption,
+                                                         withSocketsDo)
+import           UnliftIO                               (toException)
 import qualified UnliftIO
-import UnliftIO (toException)
-import qualified Data.ByteString as S
-import Data.IORef (newIORef, readIORef)
-import Data.Streaming.Network (bindPortTCP)
-import Foreign.C.Error (Errno(..), eCONNABORTED)
-import GHC.IO.Exception (IOException(..), IOErrorType(..))
-import Network.Socket (Socket, close, accept, withSocketsDo, SockAddr, setSocketOption, SocketOption(..))
 #if MIN_VERSION_network(3,1,1)
-import Network.Socket (gracefulClose)
+import           Network.Socket                         (gracefulClose)
 #endif
-import qualified Network.Socket.ByteString as Sock
-import Network.Wai
-import System.Environment (lookupEnv)
-import System.IO.Error (ioeGetErrorType)
-import qualified System.TimeManager as T
-import System.Timeout (timeout)
+import qualified Network.Socket.ByteString              as Sock
+import           Network.Wai
+import           System.Environment                     (lookupEnv)
+import           System.IO.Error                        (ioeGetErrorType)
+import qualified System.TimeManager                     as T
+import           System.Timeout                         (timeout)
 
-import Network.Wai.Handler.Warp.Buffer
-import Network.Wai.Handler.Warp.Counter
-import qualified Network.Wai.Handler.Warp.Date as D
-import qualified Network.Wai.Handler.Warp.FdCache as F
+import           Network.Wai.Handler.Warp.Buffer
+import           Network.Wai.Handler.Warp.Counter
+import qualified Network.Wai.Handler.Warp.Date          as D
+import qualified Network.Wai.Handler.Warp.FdCache       as F
 import qualified Network.Wai.Handler.Warp.FileInfoCache as I
-import Network.Wai.Handler.Warp.HTTP1 (http1)
-import Network.Wai.Handler.Warp.HTTP2 (http2)
-import Network.Wai.Handler.Warp.HTTP2.Types (isHTTP2)
-import Network.Wai.Handler.Warp.Imports hiding (readInt)
-import Network.Wai.Handler.Warp.Recv
-import Network.Wai.Handler.Warp.SendFile
-import Network.Wai.Handler.Warp.Settings
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.HTTP1         (http1)
+import           Network.Wai.Handler.Warp.HTTP2         (http2)
+import           Network.Wai.Handler.Warp.HTTP2.Types   (isHTTP2)
+import           Network.Wai.Handler.Warp.Imports       hiding (readInt)
+import           Network.Wai.Handler.Warp.Recv
+import           Network.Wai.Handler.Warp.SendFile
+import           Network.Wai.Handler.Warp.Settings
+import           Network.Wai.Handler.Warp.Types
 
 
 #if WINDOWS
-import Network.Wai.Handler.Warp.Windows
+import           Network.Wai.Handler.Warp.Windows
 #else
-import Network.Socket (fdSocket)
+import           Network.Socket                         (fdSocket)
 #endif
 
 -- | Creating 'Connection' for plain HTTP based on a given socket.
@@ -111,7 +117,7 @@ runEnv p app = do
     runReadPort :: String -> IO ()
     runReadPort sp = case reads sp of
         ((p', _):_) -> run p' app
-        _ -> fail $ "Invalid value in $PORT: " ++ sp
+        _           -> fail $ "Invalid value in $PORT: " ++ sp
 
 -- | Run an 'Application' with the given 'Settings'.
 -- This opens a listen socket on the port defined in 'Settings' and

@@ -14,9 +14,10 @@ module Network.Wai.Middleware.StripHeaders
     , stripHeadersIf
     ) where
 
-import Network.Wai                       (Middleware, Request, modifyResponse, mapResponseHeaders, ifRequest)
-import Network.Wai.Internal (Response)
-import Data.ByteString                   (ByteString)
+import           Data.ByteString      (ByteString)
+import           Network.Wai          (Middleware, Request, ifRequest,
+                                       mapResponseHeaders, modifyResponse)
+import           Network.Wai.Internal (Response)
 
 import qualified Data.CaseInsensitive as CI
 

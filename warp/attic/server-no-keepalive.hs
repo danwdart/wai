@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai.Handler.Warp
-import Control.Exception (bracket)
-import Control.Monad (forever)
-import Network (sClose)
-import Network.Socket (accept)
-import Control.Monad.IO.Class (liftIO)
-import qualified Data.Enumerator as E
-import qualified Data.Enumerator.Binary as EB
-import Control.Concurrent (forkIO)
-import Network.Wai (responseLBS)
-import Network.HTTP.Types (status200)
-import Data.Enumerator (($$), run_)
+import           Control.Concurrent       (forkIO)
+import           Control.Exception        (bracket)
+import           Control.Monad            (forever)
+import           Control.Monad.IO.Class   (liftIO)
+import           Data.Enumerator          (run_, ($$))
+import qualified Data.Enumerator          as E
+import qualified Data.Enumerator.Binary   as EB
+import           Network                  (sClose)
+import           Network.HTTP.Types       (status200)
+import           Network.Socket           (accept)
+import           Network.Wai              (responseLBS)
+import           Network.Wai.Handler.Warp
 
 app = const $ return $ responseLBS status200 [("Content-type", "text/plain")] "This is not kept alive under any circumstances"
 

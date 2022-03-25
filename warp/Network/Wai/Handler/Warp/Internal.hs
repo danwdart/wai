@@ -73,20 +73,20 @@ module Network.Wai.Handler.Warp.Internal (
   , pReadMaker
   ) where
 
-import System.TimeManager
+import           System.TimeManager
 
-import Network.Wai.Handler.Warp.Buffer
-import Network.Wai.Handler.Warp.Date
-import Network.Wai.Handler.Warp.FdCache
-import Network.Wai.Handler.Warp.FileInfoCache
-import Network.Wai.Handler.Warp.HTTP2
-import Network.Wai.Handler.Warp.HTTP2.File
-import Network.Wai.Handler.Warp.Header
-import Network.Wai.Handler.Warp.Recv
-import Network.Wai.Handler.Warp.Request
-import Network.Wai.Handler.Warp.Response
-import Network.Wai.Handler.Warp.Run
-import Network.Wai.Handler.Warp.SendFile
-import Network.Wai.Handler.Warp.Settings
-import Network.Wai.Handler.Warp.Types
-import Network.Wai.Handler.Warp.Windows
+import           Network.Wai.Handler.Warp.Buffer
+import           Network.Wai.Handler.Warp.Date
+import           Network.Wai.Handler.Warp.FdCache
+import           Network.Wai.Handler.Warp.FileInfoCache
+import           Network.Wai.Handler.Warp.HTTP2
+import           Network.Wai.Handler.Warp.HTTP2.File
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.Recv
+import           Network.Wai.Handler.Warp.Request
+import           Network.Wai.Handler.Warp.Response
+import           Network.Wai.Handler.Warp.Run
+import           Network.Wai.Handler.Warp.SendFile
+import           Network.Wai.Handler.Warp.Settings
+import           Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Windows

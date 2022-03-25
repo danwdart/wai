@@ -1,17 +1,17 @@
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Network.Wai.Handler.Warp.ResponseHeader (composeHeader) where
 
-import qualified Data.ByteString as S
-import Data.ByteString.Internal (create)
-import qualified Data.CaseInsensitive as CI
-import Foreign.Ptr
-import GHC.Storable
-import qualified Network.HTTP.Types as H
+import qualified Data.ByteString                  as S
+import           Data.ByteString.Internal         (create)
+import qualified Data.CaseInsensitive             as CI
+import           Foreign.Ptr
+import           GHC.Storable
+import qualified Network.HTTP.Types               as H
 
-import Network.Wai.Handler.Warp.Buffer (copy)
-import Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Buffer  (copy)
+import           Network.Wai.Handler.Warp.Imports
 
 ----------------------------------------------------------------
 

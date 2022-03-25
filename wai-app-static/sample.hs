@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.String
-import Data.Text (pack)
-import Data.Maybe (mapMaybe)
-import WaiAppStatic.Types (ssIndices, toPiece)
-import Network.Wai.Application.Static (staticApp,defaultFileServerSettings)
-import Network.Wai.Handler.Warp (runSettings, settingsPort, defaultSettings)
-  
+import           Data.Maybe                     (mapMaybe)
+import           Data.String
+import           Data.Text                      (pack)
+import           Network.Wai.Application.Static (defaultFileServerSettings,
+                                                 staticApp)
+import           Network.Wai.Handler.Warp       (defaultSettings, runSettings,
+                                                 settingsPort)
+import           WaiAppStatic.Types             (ssIndices, toPiece)
+
 main :: IO ()
 main = runSettings defaultSettings
     {

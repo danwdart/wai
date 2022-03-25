@@ -10,10 +10,10 @@ module HTTP (
   , HeaderName
   ) where
 
-import Network.HTTP.Client
-import Network.HTTP.Types
-import Data.ByteString
+import           Data.ByteString
 import qualified Data.ByteString.Lazy as BL
+import           Network.HTTP.Client
+import           Network.HTTP.Types
 
 sendGET :: String -> IO (Response BL.ByteString)
 sendGET url = sendGETwH url []
@@ -23,8 +23,7 @@ sendGETwH url hdr = do
     manager <- newManager defaultManagerSettings
     request <- parseRequest url
     let request' = request { requestHeaders = hdr }
-    response <- httpLbs request' manager
-    return response
+    httpLbs request' manager
 
 sendHEAD :: String -> IO (Response BL.ByteString)
 sendHEAD url = sendHEADwH url []
@@ -34,8 +33,7 @@ sendHEADwH url hdr = do
     manager <- newManager defaultManagerSettings
     request <- parseRequest url
     let request' = request { requestHeaders = hdr, method = methodHead }
-    response <- httpLbs request' manager
-    return response
+    httpLbs request' manager
 
 getHeaderValue :: HeaderName -> [Header] -> Maybe ByteString
 getHeaderValue = lookup

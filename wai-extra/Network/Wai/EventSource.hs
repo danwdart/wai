@@ -15,13 +15,14 @@ module Network.Wai.EventSource (
     eventStreamAppRaw
     ) where
 
-import           Data.Function (fix)
-import           Control.Concurrent.Chan (Chan, dupChan, readChan)
-import           Control.Monad.IO.Class (liftIO)
-import           Network.HTTP.Types (status200, hContentType)
-import           Network.Wai (Application, responseStream)
+import           Control.Concurrent.Chan             (Chan, dupChan, readChan)
+import           Control.Monad.IO.Class              (liftIO)
+import           Data.Function                       (fix)
+import           Network.HTTP.Types                  (hContentType, status200)
+import           Network.Wai                         (Application,
+                                                      responseStream)
 
-import Network.Wai.EventSource.EventStream
+import           Network.Wai.EventSource.EventStream
 
 -- | Make a new WAI EventSource application reading events from
 -- the given channel.
@@ -56,6 +57,4 @@ eventStreamAppRaw handler _ sendResponse =
         $ \sendChunk flush -> handler (sendEvent sendChunk) flush
     where
         sendEvent sendChunk event =
-            case eventToBuilder event of
-                Nothing -> return ()
-                Just b  -> sendChunk b
+            Data.Foldable.forM_ (eventToBuilder event) sendChunk

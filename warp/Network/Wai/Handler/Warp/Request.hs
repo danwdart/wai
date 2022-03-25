@@ -1,7 +1,7 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE BangPatterns       #-}
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings  #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 module Network.Wai.Handler.Warp.Request (
@@ -13,32 +13,34 @@ module Network.Wai.Handler.Warp.Request (
   , NoKeepAliveRequest (..)
   ) where
 
-import qualified Control.Concurrent as Conc (yield)
-import UnliftIO (throwIO, Exception)
-import Data.Array ((!))
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Unsafe as SU
-import qualified Data.CaseInsensitive as CI
-import qualified Data.IORef as I
-import Data.Typeable (Typeable)
-import qualified Data.Vault.Lazy as Vault
-import Data.X509
-import qualified Network.HTTP.Types as H
-import Network.Socket (SockAddr)
-import Network.Wai
-import Network.Wai.Handler.Warp.Types
-import Network.Wai.Internal
-import Prelude hiding (lines)
-import System.IO.Unsafe (unsafePerformIO)
-import qualified System.TimeManager as Timeout
+import qualified Control.Concurrent                     as Conc (yield)
+import           Data.Array                             ((!))
+import qualified Data.ByteString                        as S
+import qualified Data.ByteString.Unsafe                 as SU
+import qualified Data.CaseInsensitive                   as CI
+import qualified Data.IORef                             as I
+import           Data.Typeable                          (Typeable)
+import qualified Data.Vault.Lazy                        as Vault
+import           Data.X509
+import qualified Network.HTTP.Types                     as H
+import           Network.Socket                         (SockAddr)
+import           Network.Wai
+import           Network.Wai.Handler.Warp.Types
+import           Network.Wai.Internal
+import           Prelude                                hiding (lines)
+import           System.IO.Unsafe                       (unsafePerformIO)
+import qualified System.TimeManager                     as Timeout
+import           UnliftIO                               (Exception, throwIO)
 
-import Network.Wai.Handler.Warp.Conduit
-import Network.Wai.Handler.Warp.FileInfoCache
-import Network.Wai.Handler.Warp.Header
-import Network.Wai.Handler.Warp.Imports hiding (readInt, lines)
-import Network.Wai.Handler.Warp.ReadInt
-import Network.Wai.Handler.Warp.RequestHeader
-import Network.Wai.Handler.Warp.Settings (Settings, settingsNoParsePath, settingsMaxTotalHeaderLength)
+import           Network.Wai.Handler.Warp.Conduit
+import           Network.Wai.Handler.Warp.FileInfoCache
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.Imports       hiding (lines, readInt)
+import           Network.Wai.Handler.Warp.ReadInt
+import           Network.Wai.Handler.Warp.RequestHeader
+import           Network.Wai.Handler.Warp.Settings      (Settings,
+                                                         settingsMaxTotalHeaderLength,
+                                                         settingsNoParsePath)
 
 ----------------------------------------------------------------
 

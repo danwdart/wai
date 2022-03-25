@@ -1,16 +1,16 @@
-{-# LANGUAGE NamedFieldPuns #-}
+
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+
 
 module Network.Wai.Handler.Warp.HTTP2.Types where
 
-import qualified Data.ByteString as BS
-import qualified Network.HTTP.Types as H
-import Network.HTTP2
-import qualified Network.HTTP2.Server as H2
+import qualified Data.ByteString                  as BS
+import qualified Network.HTTP.Types               as H
+import           Network.HTTP2
+import qualified Network.HTTP2.Server             as H2
 
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 
@@ -35,7 +35,7 @@ data HTTP2Data = HTTP2Data {
     -- | Accessor for 'H2.TrailersMaker' in 'HTTP2Data'.
     --
     --   Since: 3.2.8 but the type changed in 3.3.0
-    , http2dataTrailers :: H2.TrailersMaker
+    , http2dataTrailers    :: H2.TrailersMaker
     }
 
 -- | Default HTTP/2 specific data.

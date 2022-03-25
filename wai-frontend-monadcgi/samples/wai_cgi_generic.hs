@@ -1,8 +1,8 @@
 {-# LANGUAGE PackageImports #-}
+import           "mtl" Control.Monad.Reader
 import qualified Network.CGI
-import qualified Network.Wai.Handler.SimpleServer
 import qualified Network.Wai.Frontend.MonadCGI
-import "mtl" Control.Monad.Reader
+import qualified Network.Wai.Handler.SimpleServer
 
 main :: IO ()
 main = Network.Wai.Handler.SimpleServer.run 3000
@@ -16,4 +16,4 @@ mainCGI = do
     Network.CGI.output s
 
 monadToIO :: Reader String a -> IO a
-monadToIO = return . (flip runReader) "This is a generic test"
+monadToIO = return . flip runReader "This is a generic test"

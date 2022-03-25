@@ -2,18 +2,18 @@
 
 module SendFileSpec where
 
-import Control.Monad (when)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
-import Network.Wai.Handler.Warp.Buffer
-import Network.Wai.Handler.Warp.SendFile
-import Network.Wai.Handler.Warp.Types
-import System.Directory
-import System.Exit
-import qualified System.IO as IO
-import System.Process (system)
-import Test.Hspec
-import UnliftIO.Exception
+import           Control.Monad                     (when)
+import           Data.ByteString                   (ByteString)
+import qualified Data.ByteString                   as BS
+import           Network.Wai.Handler.Warp.Buffer
+import           Network.Wai.Handler.Warp.SendFile
+import           Network.Wai.Handler.Warp.Types
+import           System.Directory
+import           System.Exit
+import qualified System.IO                         as IO
+import           System.Process                    (system)
+import           Test.Hspec
+import           UnliftIO.Exception
 
 main :: IO ()
 main = hspec spec

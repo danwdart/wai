@@ -1,7 +1,7 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE BangPatterns        #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Network.Wai.Handler.Warp.HTTP2 (
@@ -9,25 +9,26 @@ module Network.Wai.Handler.Warp.HTTP2 (
   , http2server
   ) where
 
+import qualified Data.ByteString                            as BS
+import           Data.IORef                                 (IORef, newIORef,
+                                                             writeIORef)
+import qualified Data.IORef                                 as I
+import qualified Network.HTTP2.Frame                        as H2
+import qualified Network.HTTP2.Server                       as H2
+import           Network.Socket                             (SockAddr)
+import           Network.Wai
+import           Network.Wai.Internal                       (ResponseReceived (..))
+import qualified System.TimeManager                         as T
 import qualified UnliftIO
-import qualified Data.ByteString as BS
-import Data.IORef (IORef, newIORef, writeIORef)
-import qualified Data.IORef as I
-import qualified Network.HTTP2.Frame as H2
-import qualified Network.HTTP2.Server as H2
-import Network.Socket (SockAddr)
-import Network.Wai
-import Network.Wai.Internal (ResponseReceived(..))
-import qualified System.TimeManager as T
 
-import Network.Wai.Handler.Warp.HTTP2.File
-import Network.Wai.Handler.Warp.HTTP2.PushPromise
-import Network.Wai.Handler.Warp.HTTP2.Request
-import Network.Wai.Handler.Warp.HTTP2.Response
-import Network.Wai.Handler.Warp.Imports
-import qualified Network.Wai.Handler.Warp.Settings as S
-import Network.Wai.Handler.Warp.Types
-import Network.Wai.Handler.Warp.Recv
+import           Network.Wai.Handler.Warp.HTTP2.File
+import           Network.Wai.Handler.Warp.HTTP2.PushPromise
+import           Network.Wai.Handler.Warp.HTTP2.Request
+import           Network.Wai.Handler.Warp.HTTP2.Response
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Recv
+import qualified Network.Wai.Handler.Warp.Settings          as S
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 
@@ -108,9 +109,7 @@ http2server settings ii transport addr app h2req0 aux0 response = do
       where
         !logger = S.settingsServerPushLogger settings
         !path = H2.promiseRequestPath pp
-        !siz = case H2.responseBodySize $ H2.promiseResponse pp of
-            Nothing -> 0
-            Just s  -> fromIntegral s
+        !siz = maybe 0 fromIntegral (H2.responseBodySize $ H2.promiseResponse pp)
 
 wrappedRecvN :: T.Handle -> IORef Bool -> Int -> (BufSize -> IO ByteString) -> (BufSize -> IO ByteString)
 wrappedRecvN th istatus slowlorisSize readN bufsize = do

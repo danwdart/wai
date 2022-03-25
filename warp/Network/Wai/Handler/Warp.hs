@@ -1,6 +1,6 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE CPP           #-}
 {-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE RankNTypes    #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 ---------------------------------------------------------
@@ -125,25 +125,29 @@ module Network.Wai.Handler.Warp (
   , defaultPushPromise
   ) where
 
-import UnliftIO.Exception (SomeException, throwIO)
-import Data.Streaming.Network (HostPreference)
-import qualified Data.Vault.Lazy as Vault
-import Data.X509
-import qualified Network.HTTP.Types as H
-import Network.Socket (SockAddr)
-import Network.Wai (Request, Response, vault)
-import System.TimeManager
+import           Data.Streaming.Network                   (HostPreference)
+import qualified Data.Vault.Lazy                          as Vault
+import           Data.X509
+import qualified Network.HTTP.Types                       as H
+import           Network.Socket                           (SockAddr)
+import           Network.Wai                              (Request, Response,
+                                                           vault)
+import           System.TimeManager
+import           UnliftIO.Exception                       (SomeException,
+                                                           throwIO)
 
-import Network.Wai.Handler.Warp.FileInfoCache
-import Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data, setHTTP2Data, modifyHTTP2Data)
-import Network.Wai.Handler.Warp.HTTP2.Types
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Request
-import Network.Wai.Handler.Warp.Response (warpVersion)
-import Network.Wai.Handler.Warp.Run
-import Network.Wai.Handler.Warp.Settings
-import Network.Wai.Handler.Warp.Types hiding (getFileInfo)
-import Network.Wai.Handler.Warp.WithApplication
+import           Network.Wai.Handler.Warp.FileInfoCache
+import           Network.Wai.Handler.Warp.HTTP2.Request   (getHTTP2Data,
+                                                           modifyHTTP2Data,
+                                                           setHTTP2Data)
+import           Network.Wai.Handler.Warp.HTTP2.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Request
+import           Network.Wai.Handler.Warp.Response        (warpVersion)
+import           Network.Wai.Handler.Warp.Run
+import           Network.Wai.Handler.Warp.Settings
+import           Network.Wai.Handler.Warp.Types           hiding (getFileInfo)
+import           Network.Wai.Handler.Warp.WithApplication
 
 -- | Port to listen on. Default value: 3000
 --

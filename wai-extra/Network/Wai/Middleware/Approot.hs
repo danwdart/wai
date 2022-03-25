@@ -32,7 +32,7 @@ import qualified Data.ByteString.Char8 as S8
 import           Data.Maybe            (fromMaybe)
 import           Data.Typeable         (Typeable)
 import qualified Data.Vault.Lazy       as V
-import           Network.Wai (Request, vault, Middleware)
+import           Network.Wai           (Middleware, Request, vault)
 import           Network.Wai.Request   (guessApproot)
 import           System.Environment    (getEnvironment)
 import           System.IO.Unsafe      (unsafePerformIO)
@@ -71,7 +71,7 @@ envFallbackNamed :: String -> IO Middleware
 envFallbackNamed name = do
     env <- getEnvironment
     case lookup name env of
-        Just s -> return $ hardcoded $ S8.pack s
+        Just s  -> return $ hardcoded $ S8.pack s
         Nothing -> return fromRequest
 
 -- | Hard-code the given value as the approot.

@@ -7,9 +7,9 @@ module Network.Wai.Middleware.Push.Referer.Types (
   , defaultSettings
   ) where
 
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
-import Network.Wai.Handler.Warp (PushPromise(..), defaultPushPromise)
+import           Data.ByteString          (ByteString)
+import qualified Data.ByteString          as BS
+import           Network.Wai.Handler.Warp (PushPromise (..), defaultPushPromise)
 
 -- | Type for URL path.
 type URLPath = ByteString
@@ -48,9 +48,9 @@ getCT p
 -- | Settings for server push based on Referer:.
 data Settings = Settings {
     makePushPromise :: MakePushPromise -- ^ Default: 'defaultMakePushPromise'
-  , duration :: Int -- ^ Deprecated
-  , keyLimit :: Int -- ^ Max number of keys (e.g. index.html) in the learning information. Default: 20
-  , valueLimit :: Int -- ^ Max number of values (e.g. style.css) in the learning information. Default: 20
+  , duration        :: Int -- ^ Deprecated
+  , keyLimit        :: Int -- ^ Max number of keys (e.g. index.html) in the learning information. Default: 20
+  , valueLimit      :: Int -- ^ Max number of values (e.g. style.css) in the learning information. Default: 20
   }
 
 -- | Default settings.

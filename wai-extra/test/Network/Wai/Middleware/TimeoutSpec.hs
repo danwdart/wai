@@ -4,13 +4,14 @@ module Network.Wai.Middleware.TimeoutSpec
     ( spec
     ) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Control.Concurrent (threadDelay)
-import Network.HTTP.Types (status200, status503, status504)
-import Network.Wai
-import Network.Wai.Middleware.Timeout
-import Network.Wai.Test
+import           Control.Concurrent             (threadDelay)
+import           Network.HTTP.Types             (status200, status503,
+                                                 status504)
+import           Network.Wai
+import           Network.Wai.Middleware.Timeout
+import           Network.Wai.Test
 
 spec :: Spec
 spec = do

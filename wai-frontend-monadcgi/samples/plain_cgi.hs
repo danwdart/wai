@@ -1,4 +1,4 @@
-import Network.CGI
+import           Network.CGI
 
 main = runCGI mainCGI
 

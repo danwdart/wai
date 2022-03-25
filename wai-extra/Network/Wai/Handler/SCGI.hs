@@ -1,20 +1,21 @@
-{-# LANGUAGE CPP, ForeignFunctionInterface #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 module Network.Wai.Handler.SCGI
     ( run
     , runSendfile
     ) where
 
-import Network.Wai
-import Network.Wai.Handler.CGI (runGeneric, requestBodyFunc)
-import Foreign.Ptr
-import Foreign.Marshal.Alloc
-import Foreign.C
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Unsafe as S
-import qualified Data.ByteString.Char8 as S8
-import Data.IORef
-import Data.ByteString.Lazy.Internal (defaultChunkSize)
+import           Data.ByteString               (ByteString)
+import qualified Data.ByteString               as S
+import qualified Data.ByteString.Char8         as S8
+import           Data.ByteString.Lazy.Internal (defaultChunkSize)
+import qualified Data.ByteString.Unsafe        as S
+import           Data.IORef
+import           Foreign.C
+import           Foreign.Marshal.Alloc
+import           Foreign.Ptr
+import           Network.Wai
+import           Network.Wai.Handler.CGI       (requestBodyFunc, runGeneric)
 
 run :: Application -> IO ()
 run app = runOne Nothing app >> run app
@@ -29,7 +30,7 @@ runOne sf app = do
     let headers@((_, conLenS):_) = parseHeaders $ S.split 0 headersBS
     let conLen = case reads conLenS of
                     (i, _):_ -> i
-                    [] -> 0
+                    []       -> 0
     conLenI <- newIORef conLen
     runGeneric headers (requestBodyFunc $ input socket conLenI)
               (write socket) sf app
@@ -61,7 +62,7 @@ drain socket ilen = do
 
 parseHeaders :: [S.ByteString] -> [(String, String)]
 parseHeaders (x:y:z) = (S8.unpack x, S8.unpack y) : parseHeaders z
-parseHeaders _ = []
+parseHeaders _       = []
 
 readNetstring :: CInt -> IO S.ByteString
 readNetstring socket = do

@@ -1,5 +1,6 @@
-{-# LANGUAGE ForeignFunctionInterface, OverloadedStrings #-}
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE OverloadedStrings        #-}
 
 module Network.Wai.Handler.Warp.Recv (
     receive
@@ -9,31 +10,31 @@ module Network.Wai.Handler.Warp.Recv (
   , spell
   ) where
 
+import qualified Data.ByteString                  as BS
+import           Data.IORef
+import           Foreign.C.Error                  (eAGAIN, getErrno, throwErrno)
+import           Foreign.C.Types
+import           Foreign.ForeignPtr               (withForeignPtr)
+import           Foreign.Ptr                      (Ptr, castPtr, plusPtr)
+import           GHC.Conc                         (threadWaitRead)
+import qualified GHC.IO.Exception                 as E
+import           Network.Socket                   (Socket)
+import qualified System.IO.Error                  as E
 import qualified UnliftIO
-import qualified Data.ByteString as BS
-import Data.IORef
-import Foreign.C.Error (eAGAIN, getErrno, throwErrno)
-import Foreign.C.Types
-import Foreign.ForeignPtr (withForeignPtr)
-import Foreign.Ptr (Ptr, castPtr, plusPtr)
-import GHC.Conc (threadWaitRead)
-import qualified GHC.IO.Exception as E
-import Network.Socket (Socket)
-import qualified System.IO.Error as E
 #if MIN_VERSION_network(3,1,0)
-import Network.Socket (withFdSocket)
+import           Network.Socket                   (withFdSocket)
 #else
-import Network.Socket (fdSocket)
+import           Network.Socket                   (fdSocket)
 #endif
-import System.Posix.Types (Fd(..))
+import           System.Posix.Types               (Fd (..))
 
-import Network.Wai.Handler.Warp.Buffer
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Buffer
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 #ifdef mingw32_HOST_OS
-import GHC.IO.FD (FD(..), readRawBufferPtr)
-import Network.Wai.Handler.Warp.Windows
+import           GHC.IO.FD                        (FD (..), readRawBufferPtr)
+import           Network.Wai.Handler.Warp.Windows
 #endif
 
 ----------------------------------------------------------------

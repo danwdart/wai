@@ -32,7 +32,7 @@ spec = do
   describe "testWithApplication" $ do
     it "propagates exceptions from the server to the executing thread" $ do
       let mkApp = return $ \ _request _respond -> throwString "foo"
-      (testWithApplication mkApp $ \ port -> do
+      testWithApplication mkApp (\ port -> do
           readProcess "curl" ["-s", "localhost:" ++ show port] "")
         `shouldThrow` (\(StringException str _) -> str == "foo")
 

@@ -1,13 +1,13 @@
 module Network.WaiSpec (spec) where
 
-import Test.Hspec
-import Test.Hspec.QuickCheck (prop)
-import Network.Wai
-import Data.IORef
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import Data.ByteString.Builder (Builder, toLazyByteString, word8)
-import Control.Monad (forM_)
+import           Control.Monad           (forM_)
+import qualified Data.ByteString         as S
+import           Data.ByteString.Builder (Builder, toLazyByteString, word8)
+import qualified Data.ByteString.Lazy    as L
+import           Data.IORef
+import           Network.Wai
+import           Test.Hspec
+import           Test.Hspec.QuickCheck   (prop)
 
 spec :: Spec
 spec = do
@@ -22,7 +22,7 @@ spec = do
                         flush :: IO ()
                         flush = return ()
                     streamingBody add flush
-                    fmap (L.toStrict . toLazyByteString) $ readIORef builderRef
+                    (L.toStrict . toLazyByteString) <$> readIORef builderRef
         prop "responseLBS" $ \bytes -> do
             body <- getBody $ responseLBS undefined undefined $ L.pack bytes
             body `shouldBe` S.pack bytes
@@ -58,7 +58,7 @@ spec = do
             let req = defaultRequest
                         { requestBody = atomicModifyIORef ref $ \bss ->
                             case bss of
-                                [] -> ([], S.empty)
+                                []  -> ([], S.empty)
                                 x:y -> (y, x)
                         }
             body <- lazyRequestBody req
@@ -75,7 +75,7 @@ spec = do
             let req = defaultRequest
                         { requestBody = atomicModifyIORef ref $ \bss ->
                             case bss of
-                                [] -> ([], S.empty)
+                                []  -> ([], S.empty)
                                 x:y -> (y, x)
                         }
             body <- strictRequestBody req

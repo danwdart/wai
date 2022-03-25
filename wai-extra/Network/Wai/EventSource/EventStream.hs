@@ -9,9 +9,9 @@ module Network.Wai.EventSource.EventStream (
     eventToBuilder
     ) where
 
-import Data.ByteString.Builder
+import           Data.ByteString.Builder
 #if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
+import           Data.Monoid
 #endif
 
 {-|
@@ -66,11 +66,11 @@ field l b = l `mappend` b `mappend` nl
 eventToBuilder :: ServerEvent -> Maybe Builder
 eventToBuilder (CommentEvent txt) = Just $ field commentField txt
 eventToBuilder (RetryEvent   n)   = Just $ field retryField (string8 . show $ n)
-eventToBuilder (CloseEvent)       = Nothing
+eventToBuilder CloseEvent       = Nothing
 eventToBuilder (ServerEvent n i d)= Just $
-    (name n $ evid i $ mconcat (map (field dataField) d)) `mappend` nl
+    name n (evid i $ mconcat (map (field dataField) d)) `mappend` nl
   where
-    name Nothing  = id
+    name Nothing   = id
     name (Just n') = mappend (field nameField n')
-    evid Nothing  = id
+    evid Nothing   = id
     evid (Just i') = mappend (field idField   i')

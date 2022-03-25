@@ -18,14 +18,14 @@ module WaiAppStatic.Types
     , StaticSettings (..)
     ) where
 
-import Data.Text (Text)
-import qualified Network.HTTP.Types as H
-import qualified Network.Wai as W
-import Data.ByteString (ByteString)
-import System.Posix.Types (EpochTime)
-import qualified Data.Text as T
-import Data.ByteString.Builder (Builder)
-import Network.Mime (MimeType)
+import           Data.ByteString         (ByteString)
+import           Data.ByteString.Builder (Builder)
+import           Data.Text               (Text)
+import qualified Data.Text               as T
+import qualified Network.HTTP.Types      as H
+import           Network.Mime            (MimeType)
+import qualified Network.Wai             as W
+import           System.Posix.Types      (EpochTime)
 
 -- | An individual component of a path, or of a filepath.
 --
@@ -80,15 +80,15 @@ data Folder = Folder
 -- | Information on an individual file.
 data File = File
     { -- | Size of file in bytes
-      fileGetSize :: Integer
+      fileGetSize     :: Integer
       -- | How to construct a WAI response for this file. Some files are stored
       -- on the filesystem and can use @ResponseFile@, while others are stored
       -- in memory and should use @ResponseBuilder@.
-    , fileToResponse :: H.Status -> H.ResponseHeaders -> W.Response
+    , fileToResponse  :: H.Status -> H.ResponseHeaders -> W.Response
       -- | Last component of the filename.
-    , fileName :: Piece
+    , fileName        :: Piece
       -- | Calculate a hash of the contents of this file, such as for etag.
-    , fileGetHash :: IO (Maybe ByteString)
+    , fileGetHash     :: IO (Maybe ByteString)
       -- | Last modified time, used for both display in listings and if-modified-since.
     , fileGetModified :: Maybe EpochTime
     }
@@ -112,36 +112,36 @@ data StaticSettings = StaticSettings
     {
       -- | Lookup a single file or folder. This is how you can control storage
       -- backend (filesystem, embedded, etc) and where to lookup.
-      ssLookupFile :: Pieces -> IO LookupResult
+      ssLookupFile       :: Pieces -> IO LookupResult
 
       -- | Determine the mime type of the given file. Note that this function
       -- lives in @IO@ in case you want to perform more complicated mimetype
       -- analysis, such as via the @file@ utility.
-    , ssGetMimeType :: File -> IO MimeType
+    , ssGetMimeType      :: File -> IO MimeType
 
       -- | Ordered list of filenames to be used for indices. If the user
       -- requests a folder, and a file with the given name is found in that
       -- folder, that file is served. This supercedes any directory listing.
-    , ssIndices :: [Piece]
+    , ssIndices          :: [Piece]
 
       -- | How to perform a directory listing. Optional. Will be used when the
       -- user requested a folder.
-    , ssListing :: Maybe Listing
+    , ssListing          :: Maybe Listing
 
       -- | Value to provide for max age in the cache-control.
-    , ssMaxAge :: MaxAge
+    , ssMaxAge           :: MaxAge
 
       -- | Given a requested path and a new destination, construct a string
       -- that will go there. Default implementation will use relative paths.
-    , ssMkRedirect :: Pieces -> ByteString -> ByteString
+    , ssMkRedirect       :: Pieces -> ByteString -> ByteString
 
       -- | If @True@, send a redirect to the user when a folder is requested
       -- and an index page should be displayed. When @False@, display the
       -- content immediately.
-    , ssRedirectToIndex :: Bool
+    , ssRedirectToIndex  :: Bool
 
       -- | Prefer usage of etag caching to last-modified caching.
-    , ssUseHash :: Bool
+    , ssUseHash          :: Bool
 
       -- | Force a trailing slash at the end of directories
     , ssAddTrailingSlash :: Bool
@@ -149,5 +149,5 @@ data StaticSettings = StaticSettings
       -- | Optional `W.Application` to be used in case of 404 errors
       --
       -- Since 3.1.3
-    , ss404Handler :: Maybe W.Application
+    , ss404Handler       :: Maybe W.Application
     }

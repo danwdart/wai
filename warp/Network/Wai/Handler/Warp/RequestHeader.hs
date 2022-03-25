@@ -4,18 +4,19 @@ module Network.Wai.Handler.Warp.RequestHeader (
       parseHeaderLines
     ) where
 
-import UnliftIO (throwIO)
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as C8 (unpack)
-import Data.ByteString.Internal (memchr)
-import qualified Data.CaseInsensitive as CI
-import Foreign.ForeignPtr (withForeignPtr)
-import Foreign.Ptr (Ptr, plusPtr, minusPtr, nullPtr)
-import Foreign.Storable (peek)
-import qualified Network.HTTP.Types as H
+import qualified Data.ByteString                  as S
+import qualified Data.ByteString.Char8            as C8 (unpack)
+import           Data.ByteString.Internal         (memchr)
+import qualified Data.CaseInsensitive             as CI
+import           Foreign.ForeignPtr               (withForeignPtr)
+import           Foreign.Ptr                      (Ptr, minusPtr, nullPtr,
+                                                   plusPtr)
+import           Foreign.Storable                 (peek)
+import qualified Network.HTTP.Types               as H
+import           UnliftIO                         (throwIO)
 
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 -- $setup
 -- >>> :set -XOverloadedStrings

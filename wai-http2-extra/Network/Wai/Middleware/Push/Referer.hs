@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+
 
 -- | Middleware for server push learning dependency based on Referer:.
 module Network.Wai.Middleware.Push.Referer (
@@ -18,17 +18,18 @@ module Network.Wai.Middleware.Push.Referer (
   , valueLimit
   ) where
 
-import Control.Monad (when)
-import qualified Data.ByteString as BS
-import Data.Maybe (isNothing)
-import Network.HTTP.Types (Status(..))
-import Network.Wai
-import Network.Wai.Handler.Warp hiding (Settings, defaultSettings)
-import Network.Wai.Internal (Response(..))
+import           Control.Monad                                (when)
+import qualified Data.ByteString                              as BS
+import           Data.Maybe                                   (isNothing)
+import           Network.HTTP.Types                           (Status (..))
+import           Network.Wai
+import           Network.Wai.Handler.Warp                     hiding (Settings,
+                                                               defaultSettings)
+import           Network.Wai.Internal                         (Response (..))
 
-import qualified Network.Wai.Middleware.Push.Referer.Manager as M
-import Network.Wai.Middleware.Push.Referer.ParseURL
-import Network.Wai.Middleware.Push.Referer.Types
+import qualified Network.Wai.Middleware.Push.Referer.Manager  as M
+import           Network.Wai.Middleware.Push.Referer.ParseURL
+import           Network.Wai.Middleware.Push.Referer.Types
 
 -- $setup
 -- >>> :set -XOverloadedStrings

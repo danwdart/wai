@@ -1,15 +1,15 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Control.DebounceSpec (spec) where
 
-import Control.Concurrent
-import Control.Debounce
+import           Control.Concurrent
+import           Control.Debounce
 import qualified Control.Debounce.Internal as DI
-import Control.Monad
-import Control.Monad.Catch
-import Control.Retry
-import Data.IORef
-import Test.HUnit.Lang
-import Test.Hspec
+import           Control.Monad
+import           Control.Monad.Catch
+import           Control.Retry
+import           Data.IORef
+import           Test.HUnit.Lang
+import           Test.Hspec
 
 spec :: Spec
 spec = describe "mkDebounce" $ do
@@ -114,7 +114,7 @@ waitForBatonToBeTaken baton = waitUntil 5 $ tryReadMVar baton >>= (`shouldBe` No
 waitUntil :: Int -> IO a -> IO ()
 waitUntil n action = recovering policy [handler] (\_status -> void action)
   where policy = constantDelay 1000 `mappend` limitRetries (n * 1000) -- 1ms * n * 1000 tries = n seconds
-        handler _status = Handler (\(HUnitFailure {}) -> return True)
+        handler _status = Handler (\HUnitFailure {} -> return True)
 
 main :: IO ()
 main = hspec spec

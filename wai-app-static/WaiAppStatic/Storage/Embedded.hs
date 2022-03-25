@@ -8,5 +8,5 @@ module WaiAppStatic.Storage.Embedded(
     , mkSettings
     ) where
 
-import WaiAppStatic.Storage.Embedded.Runtime
-import WaiAppStatic.Storage.Embedded.TH
+import           WaiAppStatic.Storage.Embedded.Runtime
+import           WaiAppStatic.Storage.Embedded.TH

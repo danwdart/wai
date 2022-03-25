@@ -1,4 +1,6 @@
-{-# LANGUAGE OverloadedStrings, MagicHash, BangPatterns  #-}
+{-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE MagicHash         #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- Copyright     : Erik de Castro Lopo <erikd@mega-nerd.com>
 -- License       : BSD3
@@ -9,20 +11,20 @@
 -- Compile and run as:
 --    ghc -Wall -O3 --make readInt.hs -o readInt && ./readInt
 
-import Criterion.Main
-import Data.ByteString (ByteString)
-import Data.Int (Int64)
-import Data.Maybe (fromMaybe)
+import           Criterion.Main
+import           Data.ByteString              (ByteString)
+import           Data.Int                     (Int64)
+import           Data.Maybe                   (fromMaybe)
 
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as B
-import qualified Data.Char as C
-import qualified Numeric as N
-import qualified Test.QuickCheck as QC
+import qualified Data.ByteString              as S
+import qualified Data.ByteString.Char8        as B
 import qualified Data.ByteString.Lex.Integral as LI
+import qualified Data.Char                    as C
+import qualified Numeric                      as N
+import qualified Test.QuickCheck              as QC
 
-import GHC.Prim
-import GHC.Types
+import           GHC.Prim
+import           GHC.Types
 
 -- This is the absolute mimimal solution. It will return garbage if the
 -- imput string contains anything other than ASCI digits.
@@ -36,7 +38,7 @@ readIntOrig =
 readDec :: ByteString -> Integer
 readDec s =
     case N.readDec (B.unpack s) of
-        [] -> 0
+        []       -> 0
         (x, _):_ -> x
 
 

@@ -1,14 +1,15 @@
-{-# LANGUAGE TemplateHaskell, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module WaiAppEmbeddedTest (embSpec) where
 
-import Codec.Compression.GZip (compress)
-import EmbeddedTestEntries
-import Network.Wai
-import Network.Wai.Application.Static (staticApp)
-import Network.Wai.Test
-import Test.Hspec
-import WaiAppStatic.Storage.Embedded
-import WaiAppStatic.Types
+import           Codec.Compression.GZip         (compress)
+import           EmbeddedTestEntries
+import           Network.Wai
+import           Network.Wai.Application.Static (staticApp)
+import           Network.Wai.Test
+import           Test.Hspec
+import           WaiAppStatic.Storage.Embedded
+import           WaiAppStatic.Types
 
 defRequest :: Request
 defRequest = defaultRequest

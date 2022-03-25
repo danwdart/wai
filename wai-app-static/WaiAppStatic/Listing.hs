@@ -1,22 +1,22 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ViewPatterns      #-}
 module WaiAppStatic.Listing
     ( defaultListing
     ) where
 
-import qualified Text.Blaze.Html5.Attributes as A
-import qualified Text.Blaze.Html5            as H
-import           Text.Blaze                  ((!))
-import qualified Data.Text as T
-import Data.Time
-import Data.Time.Clock.POSIX
-import WaiAppStatic.Types
+import qualified Data.Text                     as T
+import           Data.Time
+import           Data.Time.Clock.POSIX
+import           Text.Blaze                    ((!))
+import qualified Text.Blaze.Html5              as H
+import qualified Text.Blaze.Html5.Attributes   as A
+import           WaiAppStatic.Types
 #if !MIN_VERSION_time(1,5,0)
-import System.Locale (defaultTimeLocale)
+import           System.Locale                 (defaultTimeLocale)
 #endif
-import Data.List (sortBy)
-import Util
+import           Data.List                     (sortBy)
+import           Util
 
 import qualified Text.Blaze.Html.Renderer.Utf8 as HU
 
@@ -52,7 +52,7 @@ defaultListing pieces (Folder contents) = do
                  let hasTrailingSlash =
                         case map fromPiece $ reverse $ pieces of
                             "":_ -> True
-                            _ -> False
+                            _    -> False
                  H.h1 $ showFolder' hasTrailingSlash $ filter (not . T.null . fromPiece) pieces
                  renderDirectoryContentsTable (map fromPiece pieces) haskellSrc folderSrc fps''
   where
@@ -60,7 +60,7 @@ defaultListing pieces (Folder contents) = do
     folderSrc = image "folder"
     haskellSrc = image "haskell"
     showName "" = "root"
-    showName x = x
+    showName x  = x
 
     -- Add a link to the root of the tree
     showFolder' :: Bool -> Pieces -> H.Html
@@ -99,9 +99,9 @@ renderDirectoryContentsTable pathInfo' haskellSrc folderSrc fps =
                         H.tbody $ mapM_ mkRow (zip (sortBy sortMD fps) $ cycle [False, True])
     where
       sortMD :: Either FolderName File -> Either FolderName File -> Ordering
-      sortMD Left{} Right{} = LT
-      sortMD Right{} Left{} = GT
-      sortMD (Left a) (Left b) = compare a b
+      sortMD Left{} Right{}      = LT
+      sortMD Right{} Left{}      = GT
+      sortMD (Left a) (Left b)   = compare a b
       sortMD (Right a) (Right b) = compare (fileName a) (fileName b)
 
       mkRow :: (Either FolderName File, Bool) -> H.Html
@@ -116,13 +116,13 @@ renderDirectoryContentsTable pathInfo' haskellSrc folderSrc fps =
                    let name =
                            case either id fileName md of
                                (fromPiece -> "") -> unsafeToPiece ".."
-                               x -> x
+                               x                 -> x
                    let isFile = either (const False) (const True) md
                        href = addCurrentDir $ fromPiece name
                        addCurrentDir x =
                            case reverse pathInfo' of
-                               "":_ -> x -- has a trailing slash
-                               [] -> x -- at the root
+                               "":_         -> x -- has a trailing slash
+                               []           -> x -- at the root
                                currentDir:_ -> T.concat [currentDir, "/", x]
                    H.td (H.a ! A.href (H.toValue href) $ H.toHtml $ fromPiece name)
                    H.td ! A.class_ "date" $ H.toHtml $
@@ -133,7 +133,7 @@ renderDirectoryContentsTable pathInfo' haskellSrc folderSrc fps =
                    H.td ! A.class_ "size" $ H.toHtml $
                        case md of
                            Right File { fileGetSize = s } -> prettyShow s
-                           Left{} -> ""
+                           Left{}                         -> ""
       formatCalendarTime a b c =  formatTime a b $ posixSecondsToUTCTime (realToFrac c :: POSIXTime)
       prettyShow x
         | x > 1024 = prettyShowK $ x `div` 1024
@@ -147,4 +147,4 @@ renderDirectoryContentsTable pathInfo' haskellSrc folderSrc fps =
       prettyShowG x = addCommas "GB" x
       addCommas s = (++ (' ' : s)) . reverse . addCommas' . reverse . show
       addCommas' (a:b:c:d:e) = a : b : c : ',' : addCommas' (d : e)
-      addCommas' x = x
+      addCommas' x           = x

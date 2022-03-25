@@ -1,6 +1,6 @@
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE DeriveDataTypeable #-}
+
 module Network.Wai.Test
     ( -- * Session
       Session
@@ -32,34 +32,34 @@ module Network.Wai.Test
     ) where
 
 #if __GLASGOW_HASKELL__ < 710
-import Control.Applicative ((<$>))
-import Data.Monoid (mempty, mappend)
+import           Control.Applicative        ((<$>))
+import           Data.Monoid                (mappend, mempty)
 #endif
 
-import Network.Wai
-import Network.Wai.Internal (ResponseReceived (ResponseReceived))
-import Network.Wai.Test.Internal
-import Control.Monad.IO.Class (liftIO)
-import Control.Monad.Trans.Class (lift)
-import qualified Control.Monad.Trans.State as ST
-import Control.Monad.Trans.Reader (runReaderT, ask)
-import Control.Monad (unless)
-import qualified Data.Map as Map
-import qualified Web.Cookie as Cookie
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as S8
-import Data.ByteString.Builder (toLazyByteString)
-import qualified Data.ByteString.Lazy as L
+import           Control.Monad              (unless)
+import           Control.Monad.IO.Class     (liftIO)
+import           Control.Monad.Trans.Class  (lift)
+import           Control.Monad.Trans.Reader (ask, runReaderT)
+import qualified Control.Monad.Trans.State  as ST
+import           Data.ByteString            (ByteString)
+import qualified Data.ByteString            as S
+import           Data.ByteString.Builder    (toLazyByteString)
+import qualified Data.ByteString.Char8      as S8
+import qualified Data.ByteString.Lazy       as L
 import qualified Data.ByteString.Lazy.Char8 as L8
-import qualified Network.HTTP.Types as H
-import Data.CaseInsensitive (CI)
-import qualified Data.ByteString as S
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
-import Data.IORef
-import Data.Time.Clock (getCurrentTime)
-import qualified Test.HUnit as HUnit
-import Data.CallStack (HasCallStack)
+import           Data.CallStack             (HasCallStack)
+import           Data.CaseInsensitive       (CI)
+import           Data.IORef
+import qualified Data.Map                   as Map
+import qualified Data.Text                  as T
+import qualified Data.Text.Encoding         as TE
+import           Data.Time.Clock            (getCurrentTime)
+import qualified Network.HTTP.Types         as H
+import           Network.Wai
+import           Network.Wai.Internal       (ResponseReceived (ResponseReceived))
+import           Network.Wai.Test.Internal
+import qualified Test.HUnit                 as HUnit
+import qualified Web.Cookie                 as Cookie
 
 -- |
 --
@@ -95,7 +95,7 @@ runSession :: Session a -> Application -> IO a
 runSession session app = ST.evalStateT (runReaderT session app) initState
 
 data SRequest = SRequest
-    { simpleRequest :: Request
+    { simpleRequest     :: Request
     , simpleRequestBody :: L.ByteString
     -- ^ Request body that will override the one set in 'simpleRequest'.
     --
@@ -103,9 +103,9 @@ data SRequest = SRequest
     -- in 'simpleRequest'.
     }
 data SResponse = SResponse
-    { simpleStatus :: H.Status
+    { simpleStatus  :: H.Status
     , simpleHeaders :: H.ResponseHeaders
-    , simpleBody :: L.ByteString
+    , simpleBody    :: L.ByteString
     }
     deriving (Show, Eq)
 
@@ -125,7 +125,7 @@ setPath req path = req {
     pathInfo = segments
   , rawPathInfo = (L8.toStrict . toLazyByteString) (H.encodePathSegments segments)
   , queryString = query
-  , rawQueryString = (H.renderQuery True query)
+  , rawQueryString = H.renderQuery True query
   }
   where
     (segments, query) = H.decodePath path
@@ -135,9 +135,9 @@ setRawPathInfo r rawPinfo =
     let pInfo = dropFrontSlash $ T.split (== '/') $ TE.decodeUtf8 rawPinfo
     in  r { rawPathInfo = rawPinfo, pathInfo = pInfo }
   where
-    dropFrontSlash ("":"":[]) = [] -- homepage, a single slash
+    dropFrontSlash ["", ""]  = [] -- homepage, a single slash
     dropFrontSlash ("":path) = path
-    dropFrontSlash path = path
+    dropFrontSlash path      = path
 
 addCookiesToRequest :: Request -> Session Request
 addCookiesToRequest req = do
@@ -185,7 +185,7 @@ srequest (SRequest req bod) = do
       req
         { requestBody = atomicModifyIORef refChunks $ \bss ->
             case bss of
-                [] -> ([], S.empty)
+                []  -> ([], S.empty)
                 x:y -> (y, x)
         }
 

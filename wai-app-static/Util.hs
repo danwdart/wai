@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, ViewPatterns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns      #-}
 module Util
     ( relativeDirFromPieces
     , defaultMkRedirect
@@ -7,11 +8,11 @@ module Util
     , dropLastIfNull
     ) where
 
-import WaiAppStatic.Types
-import qualified Data.Text as T
-import Data.ByteString (ByteString)
+import           Data.ByteString       (ByteString)
 import qualified Data.ByteString.Char8 as S8
-import qualified Data.Text.Encoding as TE
+import qualified Data.Text             as T
+import qualified Data.Text.Encoding    as TE
+import           WaiAppStatic.Types
 
 -- alist helper functions
 replace :: Eq a => a -> b -> [(a, b)] -> [(a, b)]
@@ -41,5 +42,5 @@ defaultMkRedirect pieces newPath
 dropLastIfNull :: [Piece] -> [Piece]
 dropLastIfNull pieces = case pieces of
     [fromPiece -> ""] -> []
-    (a : r) -> a : dropLastIfNull r
-    [] -> []
+    (a : r)           -> a : dropLastIfNull r
+    []                -> []

@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module Network.Wai.Middleware.Push.Referer.Multi where
 
-import Data.Set (Set)
+import           Data.Set (Set)
 import qualified Data.Set as Set
 
 data Multi a = Multi {

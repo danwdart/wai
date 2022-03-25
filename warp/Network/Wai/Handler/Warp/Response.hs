@@ -1,8 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BangPatterns        #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Network.Wai.Handler.Warp.Response (
     sendResponse
@@ -14,34 +14,36 @@ module Network.Wai.Handler.Warp.Response (
   , addAltSvc
   ) where
 
-import Data.ByteString.Builder.HTTP.Chunked (chunkedTransferEncoding, chunkedTransferTerminator)
-import qualified UnliftIO
-import Data.Array ((!))
-import qualified Data.ByteString as S
-import Data.ByteString.Builder (byteString, Builder)
-import Data.ByteString.Builder.Extra (flush)
-import qualified Data.ByteString.Char8 as C8
-import qualified Data.CaseInsensitive as CI
-import Data.Function (on)
-import Data.Streaming.ByteString.Builder (newByteStringBuilderRecv, reuseBufferStrategy)
-import Data.Version (showVersion)
-import Data.Word8 (_cr, _lf)
-import qualified Network.HTTP.Types as H
-import qualified Network.HTTP.Types.Header as H
-import Network.Wai
-import Network.Wai.Internal
+import           Data.Array                              ((!))
+import qualified Data.ByteString                         as S
+import           Data.ByteString.Builder                 (Builder, byteString)
+import           Data.ByteString.Builder.Extra           (flush)
+import           Data.ByteString.Builder.HTTP.Chunked    (chunkedTransferEncoding,
+                                                          chunkedTransferTerminator)
+import qualified Data.ByteString.Char8                   as C8
+import qualified Data.CaseInsensitive                    as CI
+import           Data.Function                           (on)
+import           Data.Streaming.ByteString.Builder       (newByteStringBuilderRecv,
+                                                          reuseBufferStrategy)
+import           Data.Version                            (showVersion)
+import           Data.Word8                              (_cr, _lf)
+import qualified Network.HTTP.Types                      as H
+import qualified Network.HTTP.Types.Header               as H
+import           Network.Wai
+import           Network.Wai.Internal
 import qualified Paths_warp
-import qualified System.TimeManager as T
+import qualified System.TimeManager                      as T
+import qualified UnliftIO
 
-import Network.Wai.Handler.Warp.Buffer (toBuilderBuffer)
-import qualified Network.Wai.Handler.Warp.Date as D
-import Network.Wai.Handler.Warp.File
-import Network.Wai.Handler.Warp.Header
-import Network.Wai.Handler.Warp.IO (toBufIOWith)
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.ResponseHeader
-import Network.Wai.Handler.Warp.Settings
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Buffer         (toBuilderBuffer)
+import qualified Network.Wai.Handler.Warp.Date           as D
+import           Network.Wai.Handler.Warp.File
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.IO             (toBufIOWith)
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.ResponseHeader
+import           Network.Wai.Handler.Warp.Settings
+import           Network.Wai.Handler.Warp.Types
 
 -- $setup
 -- >>> :set -XOverloadedStrings

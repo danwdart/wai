@@ -5,16 +5,17 @@ module Network.Wai.Handler.Warp.Date (
   , GMTDate
   ) where
 
-import Control.AutoUpdate (defaultUpdateSettings, updateAction, mkAutoUpdate)
-import Data.ByteString
-import Network.HTTP.Date
+import           Control.AutoUpdate    (defaultUpdateSettings, mkAutoUpdate,
+                                        updateAction)
+import           Data.ByteString
+import           Network.HTTP.Date
 
 #if WINDOWS
-import Data.Time (UTCTime, getCurrentTime)
-import Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds)
-import Foreign.C.Types (CTime(..))
+import           Data.Time             (UTCTime, getCurrentTime)
+import           Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds)
+import           Foreign.C.Types       (CTime (..))
 #else
-import System.Posix (epochTime)
+import           System.Posix          (epochTime)
 #endif
 
 -- | The type of the Date header value.

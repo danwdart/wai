@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, ForeignFunctionInterface #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 
 module Network.Wai.Handler.Warp.SendFile (
     sendFile
@@ -9,26 +10,26 @@ module Network.Wai.Handler.Warp.SendFile (
 #endif
   ) where
 
-import qualified Data.ByteString as BS
-import Network.Socket (Socket)
+import qualified Data.ByteString                  as BS
+import           Network.Socket                   (Socket)
 
 #ifdef WINDOWS
-import Foreign.ForeignPtr (newForeignPtr_)
-import Foreign.Ptr (plusPtr)
-import qualified System.IO as IO
+import           Foreign.ForeignPtr               (newForeignPtr_)
+import           Foreign.Ptr                      (plusPtr)
+import qualified System.IO                        as IO
 #else
+import           Foreign.C.Error                  (throwErrno)
+import           Foreign.C.Types
+import           Foreign.Ptr                      (Ptr, castPtr, plusPtr)
+import           Network.Sendfile
+import           Network.Wai.Handler.Warp.FdCache (closeFile, openFile)
+import           System.Posix.Types
 import qualified UnliftIO
-import Foreign.C.Error (throwErrno)
-import Foreign.C.Types
-import Foreign.Ptr (Ptr, castPtr, plusPtr)
-import Network.Sendfile
-import Network.Wai.Handler.Warp.FdCache (openFile, closeFile)
-import System.Posix.Types
 #endif
 
-import Network.Wai.Handler.Warp.Buffer
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Buffer
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 

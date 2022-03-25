@@ -1,14 +1,15 @@
-{-# LANGUAGE OverloadedStrings, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Network.Wai.Handler.Warp.Header where
 
-import Data.Array
-import Data.Array.ST
-import qualified Data.ByteString as BS
-import Data.CaseInsensitive (foldedCase)
-import Network.HTTP.Types
+import           Data.Array
+import           Data.Array.ST
+import qualified Data.ByteString                as BS
+import           Data.CaseInsensitive           (foldedCase)
+import           Network.HTTP.Types
 
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 

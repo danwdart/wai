@@ -4,16 +4,17 @@ module Network.Wai.Middleware.ForceSSLSpec
     , spec
     ) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Network.Wai.Middleware.ForceSSL
+import           Network.Wai.Middleware.ForceSSL
 
-import Control.Monad
-import Data.ByteString (ByteString)
-import Data.Monoid ((<>))
-import Network.HTTP.Types (methodPost, status200, status301, status307)
-import Network.Wai
-import Network.Wai.Test
+import           Control.Monad
+import           Data.ByteString                 (ByteString)
+import           Data.Monoid                     ((<>))
+import           Network.HTTP.Types              (methodPost, status200,
+                                                  status301, status307)
+import           Network.Wai
+import           Network.Wai.Test
 
 main :: IO ()
 main = hspec spec

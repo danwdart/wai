@@ -5,8 +5,8 @@ module Network.Wai.Middleware.RequestSizeLimit.Internal
     , setOnLengthExceeded
     ) where
 
-import Network.Wai
-import Data.Word (Word64)
+import           Data.Word   (Word64)
+import           Network.Wai
 
 -- | Settings to configure 'requestSizeLimitMiddleware'.
 --
@@ -41,7 +41,7 @@ import Data.Word (Word64)
 -- @since 3.1.1
 data RequestSizeLimitSettings = RequestSizeLimitSettings
     { maxLengthForRequest :: Request -> IO (Maybe Word64) -- ^ Function to determine the maximum request size in bytes for the request. Return 'Nothing' for no limit. Since 3.1.1
-    , onLengthExceeded :: Word64 -> Middleware -- ^ Callback function when maximum length is exceeded. The 'Word64' argument is the limit computed by 'maxLengthForRequest'. Since 3.1.1
+    , onLengthExceeded    :: Word64 -> Middleware -- ^ Callback function when maximum length is exceeded. The 'Word64' argument is the limit computed by 'maxLengthForRequest'. Since 3.1.1
     }
 
 -- | Function to determine the maximum request size in bytes for the request. Return 'Nothing' for no limit.

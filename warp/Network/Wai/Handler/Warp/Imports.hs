@@ -13,15 +13,15 @@ module Network.Wai.Handler.Warp.Imports (
   , module Numeric
   ) where
 
-import Control.Applicative
-import Control.Monad
-import Data.Bits
-import Data.ByteString.Internal (ByteString(..))
-import Data.Int
-import Data.List
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Maybe
-import Data.Monoid
-import Data.Ord
-import Data.Word
-import Numeric
+import           Control.Applicative
+import           Control.Monad
+import           Data.Bits
+import           Data.ByteString.Internal (ByteString (..))
+import           Data.Int
+import           Data.List
+import           Data.List.NonEmpty       (NonEmpty (..))
+import           Data.Maybe
+import           Data.Monoid
+import           Data.Ord
+import           Data.Word
+import           Numeric

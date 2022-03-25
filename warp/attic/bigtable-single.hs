@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai
-import Blaze.ByteString.Builder (Builder, fromByteString)
-import Blaze.ByteString.Builder.Char8 (fromShow)
-import Data.Monoid (mappend)
-import Network.Wai.Handler.Warp (run)
+import           Blaze.ByteString.Builder       (Builder, fromByteString)
+import           Blaze.ByteString.Builder.Char8 (fromShow)
+import           Data.Monoid                    (mappend)
+import           Network.Wai
+import           Network.Wai.Handler.Warp       (run)
 
 bigtable :: Builder
 bigtable =

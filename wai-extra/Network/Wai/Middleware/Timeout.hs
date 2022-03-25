@@ -5,9 +5,9 @@ module Network.Wai.Middleware.Timeout
     , timeoutAs
     ) where
 
-import Network.HTTP.Types (Status, status503)
-import Network.Wai
-import qualified System.Timeout as Timeout
+import           Network.HTTP.Types (Status, status503)
+import           Network.Wai
+import qualified System.Timeout     as Timeout
 
 -- | Time out the request after the given number of seconds
 --

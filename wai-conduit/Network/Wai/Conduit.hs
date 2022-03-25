@@ -9,15 +9,15 @@ module Network.Wai.Conduit
     , module Network.Wai
     ) where
 
-import Network.Wai
-import Data.Conduit
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as S
-import Control.Monad (unless)
-import Network.HTTP.Types
-import Data.ByteString.Builder (Builder)
-import qualified Data.Conduit.List as CL
+import           Control.Monad           (unless)
+import           Control.Monad.IO.Class  (MonadIO, liftIO)
+import           Data.ByteString         (ByteString)
+import qualified Data.ByteString         as S
+import           Data.ByteString.Builder (Builder)
+import           Data.Conduit
+import qualified Data.Conduit.List       as CL
+import           Network.HTTP.Types
+import           Network.Wai
 
 -- | Stream the request body.
 --
@@ -42,7 +42,7 @@ responseSource s hs src = responseStream s hs $ \send flush ->
     runConduit $ src .| CL.mapM_ (\mbuilder ->
         case mbuilder of
             Chunk b -> send b
-            Flush -> flush)
+            Flush   -> flush)
 
 -- | Create a raw response using @Source@ and @Sink@ conduits.
 --

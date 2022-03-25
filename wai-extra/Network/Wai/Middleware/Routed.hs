@@ -6,9 +6,9 @@ module Network.Wai.Middleware.Routed
     , hostedMiddleware
     ) where
 
-import Network.Wai
-import Data.ByteString (ByteString)
-import Data.Text (Text)
+import           Data.ByteString (ByteString)
+import           Data.Text       (Text)
+import           Network.Wai
 
 -- | Apply a middleware based on a test of pathInfo
 --
@@ -35,5 +35,5 @@ hostedMiddleware domain middle app req
   | otherwise            = app req
 
 hasDomain :: ByteString -> Request -> Bool
-hasDomain domain req = maybe False (== domain) mHost
+hasDomain domain req = (Just domain ==) mHost
   where mHost = requestHeaderHost req

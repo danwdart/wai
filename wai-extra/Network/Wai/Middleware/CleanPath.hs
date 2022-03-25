@@ -3,13 +3,13 @@ module Network.Wai.Middleware.CleanPath
     ( cleanPath
     ) where
 
-import Network.Wai
 import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy as L
-import Network.HTTP.Types (status301, hLocation)
-import Data.Text (Text)
+import qualified Data.ByteString.Lazy  as L
+import           Data.Text             (Text)
+import           Network.HTTP.Types    (hLocation, status301)
+import           Network.Wai
 #if __GLASGOW_HASKELL__ < 710
-import Data.Monoid (mconcat)
+import           Data.Monoid           (mconcat)
 #endif
 
 cleanPath :: ([Text] -> Either B.ByteString [Text])
@@ -21,12 +21,11 @@ cleanPath splitter prefix app env sendResponse =
         Right pieces -> app pieces env sendResponse
         Left p -> sendResponse
                 $ responseLBS status301
-                  [(hLocation, mconcat [prefix, p, suffix])]
-                $ L.empty
+                  [(hLocation, mconcat [prefix, p, suffix])] L.empty
     where
         -- include the query string if present
         suffix =
             case B.uncons $ rawQueryString env of
-                Nothing -> B.empty
+                Nothing       -> B.empty
                 Just ('?', _) -> rawQueryString env
-                _ -> B.cons '?' $ rawQueryString env
+                _             -> B.cons '?' $ rawQueryString env

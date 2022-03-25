@@ -1,28 +1,28 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Main where
 
-import Control.Monad
-import qualified Data.ByteString as S
+import           Control.Monad
+import qualified Data.ByteString                as S
 --import Data.ByteString.Char8 (ByteString)
-import qualified Data.ByteString.Char8 as B (unpack)
-import qualified Network.HTTP.Types as H
-import Network.Wai.Handler.Warp.Types
-import Prelude hiding (lines)
-import UnliftIO.Exception (throwIO, impureThrow)
+import qualified Data.ByteString.Char8          as B (unpack)
+import qualified Network.HTTP.Types             as H
+import           Network.Wai.Handler.Warp.Types
+import           Prelude                        hiding (lines)
+import           UnliftIO.Exception             (impureThrow, throwIO)
 
-import Data.ByteString.Internal
-import Data.Word
-import Foreign.ForeignPtr
-import Foreign.Ptr
-import Foreign.Storable
+import           Data.ByteString.Internal
+import           Data.Word
+import           Foreign.ForeignPtr
+import           Foreign.Ptr
+import           Foreign.Storable
 
 #if MIN_VERSION_gauge(0, 2, 0)
-import Gauge
+import           Gauge
 #else
-import Gauge.Main
+import           Gauge.Main
 #endif
 
 -- $setup
@@ -214,7 +214,7 @@ parseRequestLine0 s =
                         !hv =
                             case hsecond of
                                 "1.1" -> H.http11
-                                _ -> H.http10
+                                _     -> H.http10
                     in return $! (method, rpath, qstring, hv)
                else throwIO NonHttp
         _ -> throwIO $ BadFirstLine $ B.unpack s

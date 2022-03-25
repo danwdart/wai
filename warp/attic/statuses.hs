@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Data.ByteString.Lazy.Char8 (pack)
-import qualified Data.ByteString.Char8 as S
+import qualified Data.ByteString.Char8      as S
+import           Data.ByteString.Lazy.Char8 (pack)
+import           Network.Wai
+import           Network.Wai.Handler.Warp
 
 main = run 3000 app
 

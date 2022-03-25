@@ -1,26 +1,24 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE BangPatterns        #-}
+
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Network.Wai.Handler.Warp.HTTP2.PushPromise where
 
+import qualified Network.HTTP.Types                     as H
+import qualified Network.HTTP2.Server                   as H2
 import qualified UnliftIO
-import qualified Network.HTTP.Types as H
-import qualified Network.HTTP2.Server as H2
 
-import Network.Wai
-import Network.Wai.Handler.Warp.FileInfoCache
-import Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data)
-import Network.Wai.Handler.Warp.HTTP2.Types
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai
+import           Network.Wai.Handler.Warp.FileInfoCache
+import           Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data)
+import           Network.Wai.Handler.Warp.HTTP2.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 fromPushPromises :: InternalInfo -> Request -> IO [H2.PushPromise]
 fromPushPromises ii req = do
     mh2data <- getHTTP2Data req
-    let pp = case mh2data of
-          Nothing     -> []
-          Just h2data -> http2dataPushPromise h2data
+    let pp = maybe [] http2dataPushPromise mh2data
     catMaybes <$> mapM (fromPushPromise ii) pp
 
 fromPushPromise :: InternalInfo -> PushPromise -> IO (Maybe H2.PushPromise)

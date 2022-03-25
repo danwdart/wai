@@ -22,35 +22,47 @@ module Network.Wai.Middleware.RequestLogger
     , IPAddrSource (..)
     ) where
 
-import System.IO (Handle, hFlush, stdout)
-import qualified Data.ByteString.Builder as B (Builder, byteString)
-import qualified Data.ByteString as BS
-import Data.ByteString.Char8 (pack)
-import Control.Monad (when)
-import Control.Monad.IO.Class (liftIO)
-import Network.Wai
-  ( Request(..), requestBodyLength, RequestBodyLength(..)
-  , Middleware
-  , Response, responseStatus, responseHeaders
-  )
-import System.Log.FastLogger
-import Network.HTTP.Types as H
-import Data.Maybe (fromMaybe, isJust, mapMaybe)
-import Data.Monoid (mconcat, (<>))
-import Data.Time (getCurrentTime, diffUTCTime, NominalDiffTime, UTCTime)
-import Network.Wai.Parse (sinkRequestBody, lbsBackEnd, fileName, Param, File
-                         , getRequestBodyType)
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Char8 as S8
-import System.Console.ANSI
-import Data.IORef
-import System.IO.Unsafe
-import Network.Wai.Internal (Response (..))
-import Data.Default.Class (Default (def))
-import Network.Wai.Logger
-import Network.Wai.Middleware.RequestLogger.Internal
-import Network.Wai.Header (contentLength)
-import Data.Text.Encoding (decodeUtf8')
+import           Control.Monad                                 (when)
+import           Control.Monad.IO.Class                        (liftIO)
+import qualified Data.ByteString                               as BS
+import qualified Data.ByteString.Builder                       as B (Builder,
+                                                                     byteString)
+import           Data.ByteString.Char8                         (pack)
+import qualified Data.ByteString.Char8                         as S8
+import qualified Data.ByteString.Lazy                          as LBS
+import           Data.Default.Class                            (Default (def))
+import           Data.IORef
+import           Data.Maybe                                    (fromMaybe,
+                                                                isJust,
+                                                                mapMaybe)
+import           Data.Monoid                                   (mconcat, (<>))
+import           Data.Text.Encoding                            (decodeUtf8')
+import           Data.Time                                     (NominalDiffTime,
+                                                                UTCTime,
+                                                                diffUTCTime,
+                                                                getCurrentTime)
+import           Network.HTTP.Types                            as H
+import           Network.Wai                                   (Middleware,
+                                                                Request (..),
+                                                                RequestBodyLength (..),
+                                                                Response,
+                                                                requestBodyLength,
+                                                                responseHeaders,
+                                                                responseStatus)
+import           Network.Wai.Header                            (contentLength)
+import           Network.Wai.Internal                          (Response (..))
+import           Network.Wai.Logger
+import           Network.Wai.Middleware.RequestLogger.Internal
+import           Network.Wai.Parse                             (File, Param,
+                                                                fileName,
+                                                                getRequestBodyType,
+                                                                lbsBackEnd,
+                                                                sinkRequestBody)
+import           System.Console.ANSI
+import           System.IO                                     (Handle, hFlush,
+                                                                stdout)
+import           System.IO.Unsafe
+import           System.Log.FastLogger
 
 -- | The logging format.
 data OutputFormat
@@ -74,8 +86,8 @@ data OutputFormat
 --
 -- @since 3.1.3
 data DetailedSettings = DetailedSettings
-    { useColors :: Bool
-    , mModifyParams :: Maybe (Param -> Maybe Param)
+    { useColors       :: Bool
+    , mModifyParams   :: Maybe (Param -> Maybe Param)
     , mFilterRequests :: Maybe (Request -> Response -> Bool)
     , mPrelogRequests :: Bool -- ^ @since 3.1.7
     }
@@ -136,9 +148,9 @@ data RequestLoggerSettings = RequestLoggerSettings
       -- | Only applies when using the @Handle@ constructor for @destination@.
       --
       -- Default value: @True@.
-    , autoFlush :: Bool
+    , autoFlush    :: Bool
       -- | Default: @Handle@ @stdout@.
-    , destination :: Destination
+    , destination  :: Destination
     }
 
 instance Default RequestLoggerSettings where
@@ -288,17 +300,17 @@ ansiMethod' m = case m of
 
 ansiStatusCode' :: BS.ByteString -> BS.ByteString -> [BS.ByteString]
 ansiStatusCode' c t = case S8.take 1 c of
-    "2"     -> ansiColor' Green t
-    "3"     -> ansiColor' Yellow t
-    "4"     -> ansiColor' Red t
-    "5"     -> ansiColor' Magenta t
-    _       -> ansiColor' Blue t
+    "2" -> ansiColor' Green t
+    "3" -> ansiColor' Yellow t
+    "4" -> ansiColor' Red t
+    "5" -> ansiColor' Magenta t
+    _   -> ansiColor' Blue t
 
 recordChunks :: IORef B.Builder -> Response -> IO Response
 recordChunks i (ResponseStream s h sb) =
   return . ResponseStream s h $ (\send flush -> sb (\b -> modifyIORef i (<> b) >> send b) flush)
 recordChunks i (ResponseBuilder s h b) =
-  modifyIORef i (<> b) >> (return $ ResponseBuilder s h b)
+  modifyIORef i (<> b) >> return (ResponseBuilder s h b)
 recordChunks _ r =
   return r
 
@@ -323,7 +335,7 @@ getRequestBody req = do
   ichunks <- newIORef body
   let rbody = atomicModifyIORef ichunks $ \chunks ->
          case chunks of
-             [] -> ([], S8.empty)
+             []  -> ([], S8.empty)
              x:y -> (y, x)
   let req' = req { requestBody = rbody }
   return (req', body)
@@ -341,7 +353,7 @@ detailedMiddleware' cb DetailedSettings{..} ansiColor ansiMethod ansiStatusCode 
           -- log the request body if it is small
           (KnownLength len, _) | len <= 2048 -> getRequestBody req
           (_, Just len)        | len <= 2048 -> getRequestBody req
-          _ -> return (req, [])
+          _                                  -> return (req, [])
 
   let reqbodylog _ = if null body || isJust mModifyParams
                       then [""]
@@ -376,7 +388,7 @@ detailedMiddleware' cb DetailedSettings{..} ansiColor ansiMethod ansiStatusCode 
           let isRaw =
                   case rsp of
                       ResponseRaw{} -> True
-                      _ -> False
+                      _             -> False
               stCode = statusBS rsp
               stMsg = msgBS rsp
           t1 <- getCurrentTime
@@ -395,18 +407,18 @@ detailedMiddleware' cb DetailedSettings{..} ansiColor ansiMethod ansiStatusCode 
                 ichunks <- newIORef body
                 let rbody = atomicModifyIORef ichunks $ \chunks ->
                         case chunks of
-                            [] -> ([], S8.empty)
+                            []  -> ([], S8.empty)
                             x:y -> (y, x)
                 sinkRequestBody lbsBackEnd rbt rbody
 
     emptyGetParam :: (BS.ByteString, Maybe BS.ByteString) -> (BS.ByteString, BS.ByteString)
-    emptyGetParam (k, Just v) = (k,v)
+    emptyGetParam (k, Just v)  = (k,v)
     emptyGetParam (k, Nothing) = (k,"")
 
     collectPostParams :: ([Param], [File LBS.ByteString]) -> [Param]
     collectPostParams (postParams, files) = postParams ++
       map (\(k,v) -> (k, "FILE: " <> fileName v)) files
-    
+
     mkRequestLog :: (Foldable t, ToLogStr m) => t m -> t m -> m -> LogStr
     mkRequestLog params reqbody accept =
         foldMap toLogStr (ansiMethod (requestMethod req))

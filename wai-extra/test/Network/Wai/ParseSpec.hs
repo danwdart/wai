@@ -1,24 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.Wai.ParseSpec (main, spec) where
 
-import           Test.Hspec
 import           Test.HUnit
+import           Test.Hspec
 
-import           System.IO
+import           Control.Monad.Trans.Resource (runResourceT, withInternalState)
+import qualified Data.ByteString              as S
+import qualified Data.ByteString.Char8        as S8
+import qualified Data.ByteString.Lazy         as L
+import qualified Data.IORef                   as I
 import           Data.Monoid
-import qualified Data.IORef as I
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString.Lazy as L
-import qualified Data.Text as TS
-import qualified Data.Text.Encoding as TE
-import           Control.Monad.Trans.Resource (withInternalState, runResourceT)
-import           Network.HTTP2( HTTP2Error (..), ErrorCodeId (..) )
+import qualified Data.Text                    as TS
+import qualified Data.Text.Encoding           as TE
+import           Network.HTTP2                (ErrorCodeId (..),
+                                               HTTP2Error (..))
+import           System.IO
 
 import           Network.Wai
-import           Network.Wai.Test
 import           Network.Wai.Parse
-import           WaiExtraSpec (toRequest)
+import           Network.Wai.Test
+import           WaiExtraSpec                 (toRequest)
 
 main :: IO ()
 main = hspec spec
@@ -59,7 +60,7 @@ parseRequestBody' sink (SRequest req bod) =
             ref <- I.newIORef $ L.toChunks bod
             let rb = I.atomicModifyIORef ref $ \chunks ->
                         case chunks of
-                            [] -> ([], S.empty)
+                            []  -> ([], S.empty)
                             x:y -> (y, x)
             sinkRequestBody sink rbt rb
 
@@ -115,37 +116,37 @@ caseParseRequestBody = do
 
   it "exceeding number of files" $ do
     SRequest req4 _bod4 <- toRequest'' ctype3 content3
-    (parseRequestBodyEx ( setMaxRequestNumFiles 0 def ) lbsBackEnd req4) `shouldThrow` anyErrorCall
+    parseRequestBodyEx ( setMaxRequestNumFiles 0 def ) lbsBackEnd req4 `shouldThrow` anyErrorCall
 
   it "exceeding parameter length" $ do
     SRequest req4 _bod4 <- toRequest'' ctype3 content3
-    (parseRequestBodyEx ( setMaxRequestKeyLength 2 def ) lbsBackEnd req4) `shouldThrow` anyErrorCall
+    parseRequestBodyEx ( setMaxRequestKeyLength 2 def ) lbsBackEnd req4 `shouldThrow` anyErrorCall
 
   it "exceeding file size" $ do
     SRequest req4 _bod4 <- toRequest'' ctype3 content3
-    (parseRequestBodyEx ( setMaxRequestFileSize 2 def ) lbsBackEnd req4)
+    parseRequestBodyEx ( setMaxRequestFileSize 2 def ) lbsBackEnd req4
       `shouldThrow` unknownErrorException 413
 
   it "exceeding total file size" $ do
     SRequest req4 _bod4 <- toRequest'' ctype3 content3
-    (parseRequestBodyEx ( setMaxRequestFilesSize 20 def ) lbsBackEnd req4)
+    parseRequestBodyEx ( setMaxRequestFilesSize 20 def ) lbsBackEnd req4
       `shouldThrow` unknownErrorException 413
     SRequest req5 _bod5 <- toRequest'' ctype3 content5
-    (parseRequestBodyEx ( setMaxRequestFilesSize 20 def ) lbsBackEnd req5)
+    parseRequestBodyEx ( setMaxRequestFilesSize 20 def ) lbsBackEnd req5
       `shouldThrow` unknownErrorException 413
 
   it "exceeding max parm value size" $ do
     SRequest req4 _bod4 <- toRequest'' ctype2 content2
-    (parseRequestBodyEx ( setMaxRequestParmsSize 10 def ) lbsBackEnd req4)
+    parseRequestBodyEx ( setMaxRequestParmsSize 10 def ) lbsBackEnd req4
       `shouldThrow` unknownErrorException 413
 
   it "exceeding max header lines" $ do
     SRequest req4 _bod4 <- toRequest'' ctype2 content2
-    (parseRequestBodyEx ( setMaxHeaderLines 1 def ) lbsBackEnd req4) `shouldThrow` anyErrorCall
+    parseRequestBodyEx ( setMaxHeaderLines 1 def ) lbsBackEnd req4 `shouldThrow` anyErrorCall
 
   it "exceeding header line size" $ do
     SRequest req4 _bod4 <- toRequest'' ctype3 content4
-    (parseRequestBodyEx ( setMaxHeaderLineLength 8190 def ) lbsBackEnd req4)
+    parseRequestBodyEx ( setMaxHeaderLineLength 8190 def ) lbsBackEnd req4
       `shouldThrow` unknownErrorException 431
 
   it "Testing parseRequestBodyEx with application/x-www-form-urlencoded" $ do
@@ -160,7 +161,7 @@ caseParseRequestBody = do
     let content = "thisisalongparameterkey=andthisbeanevenlongerparametervaluehelloworldhowareyou"
     let ctype = "application/x-www-form-urlencoded"
     SRequest req _bod <- toRequest'' ctype content
-    (parseRequestBodyEx ( setMaxRequestParmsSize 10 def ) lbsBackEnd req) `shouldThrow` anyErrorCall
+    parseRequestBodyEx ( setMaxRequestParmsSize 10 def ) lbsBackEnd req `shouldThrow` anyErrorCall
 
   where
     content2 =

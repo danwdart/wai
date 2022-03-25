@@ -1,8 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell, CPP #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE TemplateHaskell     #-}
 -- | Static file serving for WAI.
 module Network.Wai.Application.Static
     ( -- * WAI application
@@ -25,30 +26,31 @@ module Network.Wai.Application.Static
     , ss404Handler
     ) where
 
-import Prelude hiding (FilePath)
-import qualified Network.Wai as W
-import qualified Network.HTTP.Types as H
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString.Lazy as L
-import Data.ByteString.Lazy.Char8 ()
-import Control.Monad.IO.Class (liftIO)
+import           Control.Monad.IO.Class          (liftIO)
+import           Data.ByteString                 (ByteString)
+import qualified Data.ByteString.Char8           as S8
+import qualified Data.ByteString.Lazy            as L
+import           Data.ByteString.Lazy.Char8      ()
+import qualified Network.HTTP.Types              as H
+import qualified Network.Wai                     as W
+import           Prelude                         hiding (FilePath)
 
-import Data.ByteString.Builder (toLazyByteString)
+import           Data.ByteString.Builder         (toLazyByteString)
 
-import Data.FileEmbed (embedFile)
+import           Data.FileEmbed                  (embedFile)
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
+import           Data.Text                       (Text)
+import qualified Data.Text                       as T
+import qualified Data.Text.Encoding              as TE
 
-import Network.HTTP.Date (parseHTTPDate, epochTimeToHTTPDate, formatHTTPDate)
+import           Network.HTTP.Date               (epochTimeToHTTPDate,
+                                                  formatHTTPDate, parseHTTPDate)
 
-import WaiAppStatic.Types
-import Util
-import WaiAppStatic.Storage.Filesystem
-import WaiAppStatic.Storage.Embedded
-import Network.Mime (MimeType)
+import           Network.Mime                    (MimeType)
+import           Util
+import           WaiAppStatic.Storage.Embedded
+import           WaiAppStatic.Storage.Filesystem
+import           WaiAppStatic.Types
 
 data StaticResponse =
       -- | Just the etag hash or Nothing for no etag hash
@@ -108,9 +110,9 @@ checkPieces _ pieces _ | any (T.null . fromPiece) $ safeInit pieces =
 checkPieces ss@StaticSettings {..} pieces req = do
     res <- lookupResult
     case res of
-        Left location -> return $ RawRedirect location
-        Right LRNotFound -> return NotFound
-        Right (LRFile file) -> serveFile ss req file
+        Left location           -> return $ RawRedirect location
+        Right LRNotFound        -> return NotFound
+        Right (LRFile file)     -> serveFile ss req file
         Right (LRFolder folder) -> serveFolder ss pieces req folder
   where
     lookupResult :: IO (Either ByteString LookupResult)
@@ -149,7 +151,7 @@ checkPieces ss@StaticSettings {..} pieces req = do
             LRNotFound -> lookupIndices xs
             _ -> return $ case (ssAddTrailingSlash, addTrailingSlash req) of
                 (True, Just redirect) -> Left redirect
-                _ -> Right res
+                _                     -> Right res
     lookupIndices [] = return $ Right LRNotFound
 
 serveFile :: StaticSettings -> W.Request -> File -> IO StaticResponse
@@ -180,7 +182,7 @@ serveFile StaticSettings {..} req file
   where
     mLastSent = lookup "if-modified-since" (W.requestHeaders req) >>= parseHTTPDate
     lastMod =
-        case (fmap epochTimeToHTTPDate $ fileGetModified file, mLastSent) of
+        case (epochTimeToHTTPDate <$> fileGetModified file, mLastSent) of
             -- File modified time is equal to the if-modified-since header,
             -- return a 304.
             --
@@ -207,9 +209,9 @@ cacheControl maxage =
   where
     ccInt =
         case maxage of
-            NoMaxAge -> Nothing
+            NoMaxAge        -> Nothing
             MaxAgeSeconds i -> Just i
-            MaxAgeForever -> Just oneYear
+            MaxAgeForever   -> Just oneYear
     oneYear :: Int
     oneYear = 60 * 60 * 24 * 365
 
@@ -229,7 +231,7 @@ staticApp set req = staticAppPieces set (W.pathInfo req) req
 
 staticAppPieces :: StaticSettings -> [Text] -> W.Application
 staticAppPieces _ _ req sendResponse
-    | notElem (W.requestMethod req) ["GET", "HEAD"] = sendResponse $ W.responseLBS
+    | (W.requestMethod req) `notElem` ["GET", "HEAD"] = sendResponse $ W.responseLBS
         H.status405
         [("Content-Type", "text/plain")]
         "Only GET or HEAD is supported"
@@ -280,7 +282,7 @@ staticAppPieces ss rawPieces req sendResponse = liftIO $ do
                 , ("Location", path)
                 ] "Redirect"
 
-    response NotFound = case (ss404Handler ss) of
+    response NotFound = case ss404Handler ss of
         Just app -> app req sendResponse
         Nothing  -> sendResponse $ W.responseLBS H.status404
                         [ ("Content-Type", "text/plain")

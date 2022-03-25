@@ -4,11 +4,11 @@ module Network.Wai.Handler.Warp.Windows
   ) where
 
 #if WINDOWS
-import Control.Concurrent.MVar
-import Control.Concurrent
+import           Control.Concurrent
+import           Control.Concurrent.MVar
 import qualified Control.Exception
 
-import Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Imports
 
 -- | Allow main socket listening thread to be interrupted on Windows platform
 --

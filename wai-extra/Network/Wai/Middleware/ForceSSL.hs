@@ -6,16 +6,17 @@ module  Network.Wai.Middleware.ForceSSL
     ( forceSSL
     ) where
 
-import Network.Wai
-import Network.Wai.Request
+import           Network.Wai
+import           Network.Wai.Request
 
 #if __GLASGOW_HASKELL__ < 710
-import Control.Applicative ((<$>))
-import Data.Monoid (mempty)
+import           Control.Applicative ((<$>))
+import           Data.Monoid         (mempty)
 #endif
 
-import Data.Monoid ((<>))
-import Network.HTTP.Types (hLocation, methodGet, status301, status307)
+import           Data.Monoid         ((<>))
+import           Network.HTTP.Types  (hLocation, methodGet, status301,
+                                      status307)
 
 -- | For requests that don't appear secure, redirect to https
 --

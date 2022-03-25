@@ -1,19 +1,17 @@
 module BufferPoolSpec where
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Internal as B (ByteString(PS))
-import Foreign.ForeignPtr (withForeignPtr)
-import Foreign.Marshal.Utils (copyBytes)
-import Foreign.Ptr (plusPtr)
+import qualified Data.ByteString                 as B
+import qualified Data.ByteString.Internal        as B (ByteString (PS))
+import           Foreign.ForeignPtr              (withForeignPtr)
+import           Foreign.Marshal.Utils           (copyBytes)
+import           Foreign.Ptr                     (plusPtr)
 
-import Test.Hspec (Spec, hspec, shouldBe, describe, it)
+import           Test.Hspec                      (Spec, describe, hspec, it,
+                                                  shouldBe)
 
-import Network.Wai.Handler.Warp.Buffer
-    ( bufferSize
-    , newBufferPool
-    , withBufferPool
-    )
-import Network.Wai.Handler.Warp.Types (Buffer, BufSize)
+import           Network.Wai.Handler.Warp.Buffer (bufferSize, newBufferPool,
+                                                  withBufferPool)
+import           Network.Wai.Handler.Warp.Types  (BufSize, Buffer)
 
 main :: IO ()
 main = hspec spec

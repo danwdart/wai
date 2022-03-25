@@ -1,13 +1,14 @@
-{-# LANGUAGE OverloadedStrings, BangPatterns #-}
+{-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Network.Wai.Handler.Warp.PackInt where
 
-import Data.ByteString.Internal (unsafeCreate)
-import Foreign.Ptr (Ptr, plusPtr)
-import Foreign.Storable (poke)
-import qualified Network.HTTP.Types as H
+import           Data.ByteString.Internal         (unsafeCreate)
+import           Foreign.Ptr                      (Ptr, plusPtr)
+import           Foreign.Storable                 (poke)
+import qualified Network.HTTP.Types               as H
 
-import Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Imports
 
 -- $setup
 -- >>> import Data.ByteString.Char8 as C8

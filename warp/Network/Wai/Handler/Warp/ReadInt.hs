@@ -1,6 +1,6 @@
+{-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE BangPatterns #-}
 
 -- Copyright     : Erik de Castro Lopo <erikd@mega-nerd.com>
 -- License       : BSD3
@@ -13,12 +13,12 @@ module Network.Wai.Handler.Warp.ReadInt (
 -- This function lives in its own file because the MagicHash pragma interacts
 -- poorly with the CPP pragma.
 
-import qualified Data.ByteString as S
-import GHC.Prim
-import GHC.Types
-import GHC.Word
+import qualified Data.ByteString                  as S
+import           GHC.Prim
+import           GHC.Types
+import           GHC.Word
 
-import Network.Wai.Handler.Warp.Imports hiding (readInt)
+import           Network.Wai.Handler.Warp.Imports hiding (readInt)
 
 {-# INLINE readInt #-}
 readInt :: Integral a => ByteString -> a

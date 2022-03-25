@@ -1,6 +1,6 @@
+{-# LANGUAGE BangPatterns        #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE BangPatterns #-}
 -- | Access files on the filesystem.
 module WaiAppStatic.Storage.Filesystem
     ( -- * Types
@@ -11,24 +11,26 @@ module WaiAppStatic.Storage.Filesystem
     , webAppSettingsWithLookup
     ) where
 
-import WaiAppStatic.Types
-import System.FilePath ((</>))
-import System.IO (withBinaryFile, IOMode(..))
-import System.Directory (doesFileExist, doesDirectoryExist, getDirectoryContents)
-import Data.List (foldl')
-import Control.Monad (forM)
-import Util
-import Data.ByteString (ByteString)
-import Control.Exception (SomeException, try)
-import qualified Network.Wai as W
-import WaiAppStatic.Listing
-import Network.Mime
-import System.PosixCompat.Files (fileSize, getFileStatus, modificationTime, isRegularFile)
-import Data.Maybe (catMaybes)
-import Data.ByteArray.Encoding
-import Crypto.Hash (hashlazy, MD5, Digest)
-import qualified Data.ByteString.Lazy as BL (hGetContents)
-import qualified Data.Text as T
+import           Control.Exception        (SomeException, try)
+import           Control.Monad            (forM)
+import           Crypto.Hash              (Digest, MD5, hashlazy)
+import           Data.ByteArray.Encoding
+import           Data.ByteString          (ByteString)
+import qualified Data.ByteString.Lazy     as BL (hGetContents)
+import           Data.List                (foldl')
+import           Data.Maybe               (catMaybes)
+import qualified Data.Text                as T
+import           Network.Mime
+import qualified Network.Wai              as W
+import           System.Directory         (doesDirectoryExist, doesFileExist,
+                                           getDirectoryContents)
+import           System.FilePath          ((</>))
+import           System.IO                (IOMode (..), withBinaryFile)
+import           System.PosixCompat.Files (fileSize, getFileStatus,
+                                           isRegularFile, modificationTime)
+import           Util
+import           WaiAppStatic.Listing
+import           WaiAppStatic.Types
 
 -- | Construct a new path from a root and some @Pieces@.
 pathFromPieces :: FilePath -> Pieces -> FilePath
@@ -82,7 +84,7 @@ fileHelperLR :: ETagLookup
              -> FilePath -- ^ file location
              -> Piece -- ^ file name
              -> IO LookupResult
-fileHelperLR a b c = fmap (maybe LRNotFound LRFile) $ fileHelper a b c
+fileHelperLR a b c = (maybe LRNotFound LRFile) <$> fileHelper a b c
 
 -- | Attempt to load up a @File@ from the given path.
 fileHelper :: ETagLookup
@@ -130,12 +132,12 @@ hashFileIfExists fp = do
     res <- try $ hashFile fp
     return $ case res of
         Left (_ :: SomeException) -> Nothing
-        Right x -> Just x
+        Right x                   -> Just x
 
 isVisible :: FilePath -> Bool
 isVisible ('.':_) = False
-isVisible "" = False
-isVisible _ = True
+isVisible ""      = False
+isVisible _       = True
 
 -- | Get a proper @LookupResult@, checking if the path is a file or folder.
 -- Compare with @webAppLookup@, which only deals with files.
@@ -150,7 +152,7 @@ fileSystemLookup hashFunc prefix pieces = do
             de <- doesDirectoryExist fp
             if de
                 then do
-                    entries' <- fmap (filter isVisible) $ getDirectoryContents fp
+                    entries' <- (filter isVisible) <$> getDirectoryContents fp
                     entries <- forM entries' $ \fpRel' -> do
                         let name = unsafeToPiece $ T.pack fpRel'
                             fp' = fp </> fpRel'
@@ -160,7 +162,7 @@ fileSystemLookup hashFunc prefix pieces = do
                             else do
                                 mfile <- fileHelper hashFunc fp' name
                                 case mfile of
-                                    Nothing -> return Nothing
+                                    Nothing   -> return Nothing
                                     Just file -> return $ Just $ Right file
                     return $ LRFolder $ Folder $ catMaybes entries
                 else return LRNotFound

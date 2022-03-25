@@ -3,13 +3,14 @@
 -- @since 3.0.14
 module Network.Wai.Middleware.ForceDomain where
 
-import Data.ByteString (ByteString)
-import Data.Monoid ((<>), mempty)
-import Network.HTTP.Types (hLocation, methodGet, status301, status307)
-import Prelude
+import           Data.ByteString     (ByteString)
+import           Data.Monoid         (mempty, (<>))
+import           Network.HTTP.Types  (hLocation, methodGet, status301,
+                                      status307)
+import           Prelude
 
-import Network.Wai
-import Network.Wai.Request
+import           Network.Wai
+import           Network.Wai.Request
 
 -- | Force a domain by redirecting.
 -- The `checkDomain` function takes the current domain and checks whether it is correct.

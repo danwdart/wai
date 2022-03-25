@@ -1,5 +1,5 @@
+{-# LANGUAGE CPP             #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE CPP #-}
 
 module Network.Wai.Middleware.RequestLogger.JSON
   ( formatAsJSON
@@ -8,26 +8,27 @@ module Network.Wai.Middleware.RequestLogger.JSON
   , requestToJSON
   ) where
 
-import qualified Data.ByteString.Builder as BB (toLazyByteString)
-import Data.ByteString.Lazy (toStrict)
-import Data.Aeson
-import Data.CaseInsensitive (original)
-import Data.Maybe (maybeToList)
-import Data.Monoid ((<>))
-import qualified Data.ByteString.Char8 as S8
-import Data.IP
-import qualified Data.Text as T
-import Data.Text (Text)
-import Data.Text.Encoding (decodeUtf8With)
-import Data.Text.Encoding.Error (lenientDecode)
-import Data.Time (NominalDiffTime)
-import Data.Word (Word32)
-import Network.HTTP.Types as H
-import Network.Socket (SockAddr (..), PortNumber)
-import Network.Wai
-import Network.Wai.Middleware.RequestLogger
-import System.Log.FastLogger (toLogStr)
-import Text.Printf (printf)
+import           Data.Aeson
+import qualified Data.ByteString.Builder              as BB (toLazyByteString)
+import qualified Data.ByteString.Char8                as S8
+import           Data.ByteString.Lazy                 (toStrict)
+import           Data.CaseInsensitive                 (original)
+import           Data.IP
+import           Data.Maybe                           (maybeToList)
+import           Data.Monoid                          ((<>))
+import           Data.Text                            (Text)
+import qualified Data.Text                            as T
+import           Data.Text.Encoding                   (decodeUtf8With)
+import           Data.Text.Encoding.Error             (lenientDecode)
+import           Data.Time                            (NominalDiffTime)
+import           Data.Word                            (Word32)
+import           Network.HTTP.Types                   as H
+import           Network.Socket                       (PortNumber,
+                                                       SockAddr (..))
+import           Network.Wai
+import           Network.Wai.Middleware.RequestLogger
+import           System.Log.FastLogger                (toLogStr)
+import           Text.Printf                          (printf)
 
 formatAsJSON :: OutputFormatterWithDetails
 formatAsJSON date req status responseSize duration reqBody response =
@@ -146,13 +147,13 @@ requestHeadersToJSON :: RequestHeaders -> Value
 requestHeadersToJSON = toJSON . map hToJ where
   -- Redact cookies
   hToJ ("Cookie", _) = toJSON ("Cookie" :: Text, "-RDCT-" :: Text)
-  hToJ hd = headerToJSON hd
+  hToJ hd            = headerToJSON hd
 
 responseHeadersToJSON :: [Header] -> Value
 responseHeadersToJSON = toJSON . map hToJ where
   -- Redact cookies
   hToJ ("Set-Cookie", _) = toJSON ("Set-Cookie" :: Text, "-RDCT-" :: Text)
-  hToJ hd = headerToJSON hd
+  hToJ hd                = headerToJSON hd
 
 headerToJSON :: Header -> Value
 headerToJSON (headerName, header) = toJSON (decodeUtf8With lenientDecode . original $ headerName, decodeUtf8With lenientDecode header)
@@ -164,5 +165,5 @@ httpVersionToJSON :: HttpVersion -> Value
 httpVersionToJSON (HttpVersion major minor) = String $ T.pack (show major) <> "." <> T.pack (show minor)
 
 requestBodyLengthToJSON :: RequestBodyLength -> Value
-requestBodyLengthToJSON ChunkedBody = String "Unknown"
+requestBodyLengthToJSON ChunkedBody     = String "Unknown"
 requestBodyLengthToJSON (KnownLength l) = toJSON l

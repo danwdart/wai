@@ -2,8 +2,8 @@ module Network.Wai.Middleware.MethodOverride
     ( methodOverride
     ) where
 
-import Network.Wai
-import Control.Monad (join)
+import           Control.Monad (join)
+import           Network.Wai
 
 -- | Overriding of HTTP request method via `_method` query string parameter.
 --
@@ -17,4 +17,4 @@ methodOverride app req =
     req' =
         case (requestMethod req, join $ lookup "_method" $ queryString req) of
             ("POST", Just m) -> req { requestMethod = m }
-            _ -> req
+            _                -> req

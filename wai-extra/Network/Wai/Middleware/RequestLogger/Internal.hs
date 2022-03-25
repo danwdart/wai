@@ -6,13 +6,13 @@ module Network.Wai.Middleware.RequestLogger.Internal
     ( module Network.Wai.Middleware.RequestLogger.Internal
     ) where
 
-import Data.ByteString (ByteString)
-import Network.Wai.Logger (clockDateCacher)
+import           Data.ByteString       (ByteString)
+import           Network.Wai.Logger    (clockDateCacher)
 #if !MIN_VERSION_wai_logger(2, 2, 0)
-import Control.Concurrent (forkIO, threadDelay)
-import Control.Monad (forever)
+import           Control.Concurrent    (forkIO, threadDelay)
+import           Control.Monad         (forever)
 #endif
-import System.Log.FastLogger (LogStr, fromLogStr)
+import           System.Log.FastLogger (LogStr, fromLogStr)
 
 logToByteString :: LogStr -> ByteString
 logToByteString = fromLogStr

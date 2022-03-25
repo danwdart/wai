@@ -7,12 +7,12 @@ module Network.Wai.Middleware.RealIp
     , ipInRange
     ) where
 
-import qualified Data.ByteString.Char8 as B8 (unpack, split)
-import qualified Data.IP as IP
-import Data.Maybe (fromMaybe, mapMaybe, listToMaybe)
-import Network.HTTP.Types (HeaderName, RequestHeaders)
-import Network.Wai
-import Text.Read (readMaybe)
+import qualified Data.ByteString.Char8 as B8 (split, unpack)
+import qualified Data.IP               as IP
+import           Data.Maybe            (fromMaybe, listToMaybe, mapMaybe)
+import           Network.HTTP.Types    (HeaderName, RequestHeaders)
+import           Network.Wai
+import           Text.Read             (readMaybe)
 
 -- | Infer the remote IP address from the @X-Forwarded-For@ header,
 -- trusting requests from any private IP address. See 'realIpHeader' and
@@ -48,7 +48,7 @@ realIpHeader header =
 --
 -- @since 3.1.5
 realIpTrusted :: HeaderName -> (IP.IP -> Bool) -> Middleware
-realIpTrusted header isTrusted app req respond = app req' respond
+realIpTrusted header isTrusted app req = app req'
   where
     req' = fromMaybe req $ do
              (ip, port) <- IP.fromSockAddr (remoteHost req)
@@ -79,7 +79,7 @@ ipInRange :: IP.IP -> IP.IPRange -> Bool
 ipInRange (IP.IPv4 ip) (IP.IPv4Range r) = ip `IP.isMatchedTo` r
 ipInRange (IP.IPv6 ip) (IP.IPv6Range r) = ip `IP.isMatchedTo` r
 ipInRange (IP.IPv4 ip) (IP.IPv6Range r) = IP.ipv4ToIPv6 ip `IP.isMatchedTo` r
-ipInRange _ _ = False
+ipInRange _ _                           = False
 
 
 findRealIp :: RequestHeaders -> HeaderName -> (IP.IP -> Bool) -> Maybe IP.IP

@@ -12,17 +12,20 @@ module Network.Wai.Handler.Warp.Buffer (
   , bufferIO
   ) where
 
-import qualified Data.ByteString as BS
-import Data.ByteString.Internal (memcpy)
-import Data.ByteString.Unsafe (unsafeTake, unsafeDrop)
-import Data.IORef (newIORef, readIORef, writeIORef)
+import qualified Data.ByteString                          as BS
+import           Data.ByteString.Internal                 (memcpy)
+import           Data.ByteString.Unsafe                   (unsafeDrop,
+                                                           unsafeTake)
+import           Data.IORef                               (newIORef, readIORef,
+                                                           writeIORef)
 import qualified Data.Streaming.ByteString.Builder.Buffer as B (Buffer (..))
-import Foreign.ForeignPtr
-import Foreign.Marshal.Alloc (mallocBytes, free, finalizerFree)
-import Foreign.Ptr (castPtr, plusPtr)
+import           Foreign.ForeignPtr
+import           Foreign.Marshal.Alloc                    (finalizerFree, free,
+                                                           mallocBytes)
+import           Foreign.Ptr                              (castPtr, plusPtr)
 
-import Network.Wai.Handler.Warp.Imports
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.Types
 
 ----------------------------------------------------------------
 
@@ -70,7 +73,7 @@ getBuffer pool = do
 {-# INLINE getBuffer #-}
 
 putBuffer :: BufferPool -> ByteString -> IO ()
-putBuffer pool buffer = writeIORef pool buffer
+putBuffer = writeIORef
 {-# INLINE putBuffer #-}
 
 withForeignBuffer :: ByteString -> ((Buffer, BufSize) -> IO Int) -> IO Int

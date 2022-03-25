@@ -4,16 +4,16 @@ module Network.Wai.Middleware.RoutedSpec
     , spec
     ) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Network.Wai.Middleware.Routed
-import Network.Wai.Middleware.ForceSSL (forceSSL)
+import           Network.Wai.Middleware.ForceSSL (forceSSL)
+import           Network.Wai.Middleware.Routed
 
-import Network.HTTP.Types (hContentType, status200)
-import Network.Wai
-import Network.Wai.Test
-import Data.ByteString (ByteString)
-import Data.String (IsString)
+import           Data.ByteString                 (ByteString)
+import           Data.String                     (IsString)
+import           Network.HTTP.Types              (hContentType, status200)
+import           Network.Wai
+import           Network.Wai.Test
 
 main :: IO ()
 main = hspec spec
@@ -24,7 +24,7 @@ spec = describe "forceSSL" $ do
     let destination = "https://example.com/d/"
     let routedSslJsonApp prefix = routedMiddleware (checkPrefix prefix) forceSSL jsonApp
         checkPrefix p (p1:_) = p == p1
-        checkPrefix _ _ = False
+        checkPrefix _ _      = False
 
     flip runSession (routedSslJsonApp "r") $ do
         res <- testDPath "http"
@@ -44,10 +44,10 @@ jsonApp _req cps = cps $ responseLBS status200
 
 testDPath :: ByteString -> Session SResponse
 testDPath proto =
-    request $ flip setRawPathInfo "/d/" defaultRequest
+    request $ setRawPathInfo defaultRequest
              { requestHeaders = [("X-Forwarded-Proto", proto)]
              , requestHeaderHost = Just "example.com"
-             }
+             } "/d/"
 
 location :: IsString ci => ci
 location = "Location"

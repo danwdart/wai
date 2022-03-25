@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.ByteString.Char8 (pack)
-import Data.ByteString.Lazy (fromChunks)
-import Data.Text ()
-import Network.HTTP.Types
-import Network.Wai
-import Network.Wai.Middleware.Gzip
-import Network.Wai.Middleware.Jsonp
-import Network.Wai.Handler.Warp
+import           Data.ByteString.Char8        (pack)
+import           Data.ByteString.Lazy         (fromChunks)
+import           Data.Text                    ()
+import           Network.HTTP.Types
+import           Network.Wai
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Middleware.Gzip
+import           Network.Wai.Middleware.Jsonp
 
 app :: Application
 app request = return $ case pathInfo request of

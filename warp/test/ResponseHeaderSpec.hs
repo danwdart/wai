@@ -2,12 +2,12 @@
 
 module ResponseHeaderSpec (main, spec) where
 
-import Data.ByteString
-import qualified Network.HTTP.Types as H
-import Network.Wai.Handler.Warp.ResponseHeader
-import Network.Wai.Handler.Warp.Response
-import Network.Wai.Handler.Warp.Header
-import Test.Hspec
+import           Data.ByteString
+import qualified Network.HTTP.Types                      as H
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.Response
+import           Network.Wai.Handler.Warp.ResponseHeader
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec

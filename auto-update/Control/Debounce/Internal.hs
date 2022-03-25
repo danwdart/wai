@@ -10,7 +10,8 @@ module Control.Debounce.Internal (
   ) where
 
 import           Control.Concurrent      (forkIO)
-import           Control.Concurrent.MVar (takeMVar, tryPutMVar, tryTakeMVar, MVar)
+import           Control.Concurrent.MVar (MVar, takeMVar, tryPutMVar,
+                                          tryTakeMVar)
 import           Control.Exception       (SomeException, handle, mask_)
 import           Control.Monad           (forever, void)
 
@@ -39,7 +40,7 @@ data DebounceSettings = DebounceSettings
     -- Default: does nothing.
     --
     -- @since 0.1.2
-    , debounceEdge :: DebounceEdge
+    , debounceEdge   :: DebounceEdge
     -- ^ Whether to perform the action on the leading edge or trailing edge of
     -- the timeout.
     --

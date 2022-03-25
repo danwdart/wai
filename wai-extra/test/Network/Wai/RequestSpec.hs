@@ -4,15 +4,16 @@ module Network.Wai.RequestSpec
     , spec
     ) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Data.ByteString (ByteString)
-import Network.HTTP.Types (HeaderName)
-import Network.Wai (Request(..), defaultRequest, RequestBodyLength(..))
+import           Data.ByteString     (ByteString)
+import           Network.HTTP.Types  (HeaderName)
+import           Network.Wai         (Request (..), RequestBodyLength (..),
+                                      defaultRequest)
 
-import Network.Wai.Request
-import Control.Exception (try)
-import Control.Monad (forever)
+import           Control.Exception   (try)
+import           Control.Monad       (forever)
+import           Network.Wai.Request
 
 main :: IO ()
 main = hspec spec

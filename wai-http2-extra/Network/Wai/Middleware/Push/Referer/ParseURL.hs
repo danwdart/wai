@@ -3,14 +3,17 @@ module Network.Wai.Middleware.Push.Referer.ParseURL (
     parseUrl
   ) where
 
-import Data.ByteString (ByteString)
-import Data.ByteString.Internal (ByteString(..), memchr)
-import Data.Word8
-import Foreign.ForeignPtr (withForeignPtr, ForeignPtr)
-import Foreign.Ptr (Ptr, plusPtr, minusPtr, nullPtr)
-import Foreign.Storable (peek)
+import           Data.ByteString                           (ByteString)
+import           Data.ByteString.Internal                  (ByteString (..),
+                                                            memchr)
+import           Data.Word8
+import           Foreign.ForeignPtr                        (ForeignPtr,
+                                                            withForeignPtr)
+import           Foreign.Ptr                               (Ptr, minusPtr,
+                                                            nullPtr, plusPtr)
+import           Foreign.Storable                          (peek)
 
-import Network.Wai.Middleware.Push.Referer.Types
+import           Network.Wai.Middleware.Push.Referer.Types
 
 -- |
 --

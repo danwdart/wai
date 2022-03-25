@@ -1,19 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.Wai.Middleware.RequestSizeLimitSpec (main, spec) where
 
-import Test.Hspec
+import           Test.Hspec
 
-import Network.Wai
-import Network.Wai.Test
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Char8 as S8
-import Network.Wai.Middleware.RequestSizeLimit
-import Network.HTTP.Types.Status (status200, status413)
-import Control.Monad (replicateM)
-import Data.Aeson (encode, object, (.=))
-import Data.Text (Text)
+import           Control.Monad                           (replicateM)
+import           Data.Aeson                              (encode, object, (.=))
+import           Data.ByteString                         (ByteString)
+import qualified Data.ByteString                         as S
+import qualified Data.ByteString.Char8                   as S8
+import qualified Data.ByteString.Lazy                    as L
+import           Data.Text                               (Text)
+import           Network.HTTP.Types.Status               (status200, status413)
+import           Network.Wai
+import           Network.Wai.Middleware.RequestSizeLimit
+import           Network.Wai.Test
 
 main :: IO ()
 main = hspec spec
@@ -26,7 +26,7 @@ spec = describe "RequestSizeLimitMiddleware" $ do
 
   describe "JSON response" $ do
     runStrictBodyTests "returns 413 for request bodies > 10 bytes, when streaming the whole body" tenByteLimitJSONSettings "1234567890a" (isStatus413 >> isJSONContentType)
-    runStrictBodyTests "returns 200 for request bodies <= 10 bytes, when streaming the whole body" tenByteLimitJSONSettings "1234567890" (isStatus200)
+    runStrictBodyTests "returns 200 for request bodies <= 10 bytes, when streaming the whole body" tenByteLimitJSONSettings "1234567890" isStatus200
 
   describe "Per-request sizes" $ do
 
@@ -35,7 +35,7 @@ spec = describe "RequestSizeLimitMiddleware" $ do
             { pathInfo = ["upload", "image"]
             } "1234567890a"
           settings =
-            setMaxLengthForRequest 
+            setMaxLengthForRequest
               (\req -> if pathInfo req == ["upload", "image"] then pure $ Just 20 else pure $ Just 10)
               defaultRequestSizeLimitSettings
       resp <- runStrictBodyApp settings req
@@ -55,11 +55,11 @@ spec = describe "RequestSizeLimitMiddleware" $ do
       simpleStatus resp `shouldBe` status200
 
   where
-    tenByteLimitSettings = 
+    tenByteLimitSettings =
       setMaxLengthForRequest
         (\_req -> pure $ Just 10)
         defaultRequestSizeLimitSettings
-    tenByteLimitJSONSettings = 
+    tenByteLimitJSONSettings =
       setOnLengthExceeded
         (\_maxLen _app _req sendResponse -> sendResponse $ responseLBS status413 [("Content-Type", "application/json")] (encode $ object ["error" .= ("request size too large" :: Text)]))
         tenByteLimitSettings
@@ -87,9 +87,7 @@ runStrictBodyTests name settings requestBody runExpectations = describe name $ d
     mkRequestWithBytestring :: ByteString -> LengthType -> SRequest
     mkRequestWithBytestring body lengthType = SRequest defaultRequest
       { requestHeaders =
-          if lengthType == UseKnownLength
-              then [("content-length", S8.pack $ show $ S.length body)]
-              else []
+          [("content-length", S8.pack $ show $ S.length body) | lengthType == UseKnownLength]
       , requestMethod = "POST"
       , requestBodyLength =
           if lengthType == UseKnownLength
@@ -99,7 +97,7 @@ runStrictBodyTests name settings requestBody runExpectations = describe name $ d
 
 runStrictBodyApp :: RequestSizeLimitSettings -> SRequest -> IO SResponse
 runStrictBodyApp settings req = runSession
-    (srequest req) $ (requestSizeLimitMiddleware settings) app
+    (srequest req) $ requestSizeLimitMiddleware settings app
   where
     app req respond = do
       _body <- strictRequestBody req
@@ -107,7 +105,7 @@ runStrictBodyApp settings req = runSession
 
 runStreamingChunkApp :: Int -> RequestSizeLimitSettings -> Request -> IO SResponse
 runStreamingChunkApp times settings req = runSession
-    (request req) $ (requestSizeLimitMiddleware settings) app
+    (request req) $ requestSizeLimitMiddleware settings app
   where
     app req respond = do
       _chunks <- replicateM times (getRequestBodyChunk req)

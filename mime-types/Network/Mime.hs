@@ -15,11 +15,11 @@ module Network.Mime
     , Extension
     ) where
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.ByteString (ByteString)
-import Data.ByteString.Char8 ()
-import qualified Data.Map as Map
+import           Data.ByteString       (ByteString)
+import           Data.ByteString.Char8 ()
+import qualified Data.Map              as Map
+import           Data.Text             (Text)
+import qualified Data.Text             as T
 
 -- | Maps extensions to mime types.
 type MimeMap = Map.Map Extension MimeType
@@ -472,7 +472,7 @@ defaultMimeMap = Map.fromAscList [
     -- Added after deliberation in PR (https://github.com/yesodweb/wai/pull/534)
     -- Accepted mainly because of StackOverflow (http://stackoverflow.com/questions/7319555/how-to-add-less-to-iis-7-0)
     , ("less", "text/css")
-    
+
     , ("lha", "application/x-lzh-compressed")
     , ("link66", "application/vnd.route66.link66+xml")
     , ("list", "text/plain")

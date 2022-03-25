@@ -2,12 +2,12 @@
 
 module FileSpec (main, spec) where
 
-import Network.HTTP.Types
-import Network.Wai.Handler.Warp.File
-import Network.Wai.Handler.Warp.FileInfoCache
-import Network.Wai.Handler.Warp.Header
+import           Network.HTTP.Types
+import           Network.Wai.Handler.Warp.File
+import           Network.Wai.Handler.Warp.FileInfoCache
+import           Network.Wai.Handler.Warp.Header
 
-import Test.Hspec
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec

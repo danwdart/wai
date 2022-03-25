@@ -1,32 +1,35 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PackageImports #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PackageImports      #-}
+{-# LANGUAGE PatternGuards       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Network.Wai.Handler.Warp.HTTP1 (
     http1
   ) where
 
-import "iproute" Data.IP (toHostAddress, toHostAddress6)
-import qualified Control.Concurrent as Conc (yield)
+import qualified Control.Concurrent                as Conc (yield)
+import qualified Data.ByteString                   as BS
+import           Data.Char                         (chr)
+import           Data.IORef                        (IORef, newIORef, readIORef,
+                                                    writeIORef)
+import           "iproute" Data.IP                 (toHostAddress,
+                                                    toHostAddress6)
+import           Network.Socket                    (SockAddr (SockAddrInet, SockAddrInet6))
+import           Network.Wai
+import           Network.Wai.Internal              (ResponseReceived (ResponseReceived))
+import qualified System.TimeManager                as T
+import           UnliftIO                          (SomeException,
+                                                    fromException, throwIO)
 import qualified UnliftIO
-import UnliftIO (SomeException, fromException, throwIO)
-import qualified Data.ByteString as BS
-import Data.Char (chr)
-import Data.IORef (IORef, newIORef, readIORef, writeIORef)
-import Network.Socket (SockAddr(SockAddrInet, SockAddrInet6))
-import Network.Wai
-import Network.Wai.Internal (ResponseReceived (ResponseReceived))
-import qualified System.TimeManager as T
 
-import Network.Wai.Handler.Warp.Header
-import Network.Wai.Handler.Warp.Imports hiding (readInt)
-import Network.Wai.Handler.Warp.ReadInt
-import Network.Wai.Handler.Warp.Request
-import Network.Wai.Handler.Warp.Response
-import Network.Wai.Handler.Warp.Settings
-import Network.Wai.Handler.Warp.Types
+import           Network.Wai.Handler.Warp.Header
+import           Network.Wai.Handler.Warp.Imports  hiding (readInt)
+import           Network.Wai.Handler.Warp.ReadInt
+import           Network.Wai.Handler.Warp.Request
+import           Network.Wai.Handler.Warp.Response
+import           Network.Wai.Handler.Warp.Settings
+import           Network.Wai.Handler.Warp.Types
 
 http1 :: Settings -> InternalInfo -> Connection -> Transport -> Application -> SockAddr -> T.Handle -> ByteString -> IO ()
 http1 settings ii conn transport app origAddr th bs0 = do
