@@ -19,9 +19,9 @@ import           Network.Socket                    (SockAddr (SockAddrInet, Sock
 import           Network.Wai
 import           Network.Wai.Internal              (ResponseReceived (ResponseReceived))
 import qualified System.TimeManager                as T
+import qualified UnliftIO
 import           UnliftIO                          (SomeException,
                                                     fromException, throwIO)
-import qualified UnliftIO
 
 import           Network.Wai.Handler.Warp.Header
 import           Network.Wai.Handler.Warp.Imports  hiding (readInt)

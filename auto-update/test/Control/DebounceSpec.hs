@@ -8,8 +8,8 @@ import           Control.Monad
 import           Control.Monad.Catch
 import           Control.Retry
 import           Data.IORef
-import           Test.HUnit.Lang
 import           Test.Hspec
+import           Test.HUnit.Lang
 
 spec :: Spec
 spec = describe "mkDebounce" $ do

@@ -231,7 +231,7 @@ staticApp set req = staticAppPieces set (W.pathInfo req) req
 
 staticAppPieces :: StaticSettings -> [Text] -> W.Application
 staticAppPieces _ _ req sendResponse
-    | (W.requestMethod req) `notElem` ["GET", "HEAD"] = sendResponse $ W.responseLBS
+    | W.requestMethod req `notElem` ["GET", "HEAD"] = sendResponse $ W.responseLBS
         H.status405
         [("Content-Type", "text/plain")]
         "Only GET or HEAD is supported"

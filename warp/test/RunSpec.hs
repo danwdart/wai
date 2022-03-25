@@ -24,9 +24,9 @@ import           Network.Wai.Internal      (getRequestBodyChunk)
 import           System.IO.Unsafe          (unsafePerformIO)
 import           System.Timeout            (timeout)
 import           Test.Hspec
+import qualified UnliftIO.Exception        as E
 import           UnliftIO.Exception        (IOException, bracket, onException,
                                             try)
-import qualified UnliftIO.Exception        as E
 
 import           HTTP
 
@@ -100,7 +100,7 @@ readBody icount req f = do
                 -> err icount ("Invalid hello" :: String, body)
             | requestMethod req == "GET" && L.fromChunks body /= ""
                 -> err icount ("Invalid GET" :: String, body)
-            | notElem (requestMethod req) ["GET", "POST"]
+            | requestMethod req `notElem` ["GET", "POST"]
                 -> err icount ("Invalid request method (readBody)" :: String, requestMethod req)
             | otherwise -> incr icount
     f $ responseLBS status200 [] "Read the body"
@@ -329,7 +329,7 @@ spec = do
                         , "POST / HTTP/1.1\r\nTransfer-Encoding: Chunked\r\n\r\n"
                         , "b\r\nHello World\r\n0\r\n\r\n"
                         ]
-                mapM_ ((msWrite ms) . S.singleton) (S.unpack input)
+                mapM_ (msWrite ms . S.singleton) (S.unpack input)
                 atomically $ do
                   count <- readTVar countVar
                   check $ count == 2

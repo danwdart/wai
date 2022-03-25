@@ -55,18 +55,18 @@ spec = describe "RequestSizeLimitMiddleware" $ do
       simpleStatus resp `shouldBe` status200
 
   where
-    tenByteLimitSettings =
-      setMaxLengthForRequest
-        (\_req -> pure $ Just 10)
-        defaultRequestSizeLimitSettings
-    tenByteLimitJSONSettings =
-      setOnLengthExceeded
-        (\_maxLen _app _req sendResponse -> sendResponse $ responseLBS status413 [("Content-Type", "application/json")] (encode $ object ["error" .= ("request size too large" :: Text)]))
-        tenByteLimitSettings
 
-    isStatus413 = \sResp -> simpleStatus sResp `shouldBe` status413
-    isStatus200 = \sResp -> simpleStatus sResp `shouldBe` status200
-    isJSONContentType = \sResp -> simpleHeaders sResp `shouldBe` [("Content-Type", "application/json")]
+isStatus413 sResp = simpleStatus sResp `shouldBe` status413
+isStatus200 sResp = simpleStatus sResp `shouldBe` status200
+isJSONContentType sResp = simpleHeaders sResp `shouldBe` [("Content-Type", "application/json")]
+    tenByteLimitSettings =
+  setMaxLengthForRequest
+    (\_req -> pure $ Just 10)
+    defaultRequestSizeLimitSettings
+tenByteLimitJSONSettings =
+  setOnLengthExceeded
+    (\_maxLen _app _req sendResponse -> sendResponse $ responseLBS status413 [("Content-Type", "application/json")] (encode $ object ["error" .= ("request size too large" :: Text)]))
+    tenByteLimitSettings
 
 data LengthType = UseKnownLength | UseChunked
   deriving (Show, Eq)

@@ -22,8 +22,8 @@ import           Network.Socket                         (SockAddr, Socket,
                                                          accept, close,
                                                          setSocketOption,
                                                          withSocketsDo)
-import           UnliftIO                               (toException)
 import qualified UnliftIO
+import           UnliftIO                               (toException)
 #if MIN_VERSION_network(3,1,1)
 import           Network.Socket                         (gracefulClose)
 #endif

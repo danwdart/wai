@@ -39,8 +39,8 @@ import           Network.Wai.Handler.Warp.Buffer         (toBuilderBuffer)
 import qualified Network.Wai.Handler.Warp.Date           as D
 import           Network.Wai.Handler.Warp.File
 import           Network.Wai.Handler.Warp.Header
-import           Network.Wai.Handler.Warp.IO             (toBufIOWith)
 import           Network.Wai.Handler.Warp.Imports
+import           Network.Wai.Handler.Warp.IO             (toBufIOWith)
 import           Network.Wai.Handler.Warp.ResponseHeader
 import           Network.Wai.Handler.Warp.Settings
 import           Network.Wai.Handler.Warp.Types

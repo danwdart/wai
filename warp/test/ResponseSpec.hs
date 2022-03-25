@@ -27,7 +27,7 @@ testRange range out crange = it title $ withApp defaultSettings app $ withMySock
     msWrite ms range
     msWrite ms "\r\n\r\n"
     threadDelay 10000
-    bss <- (lines . filter (/= '\r') . S8.unpack) <$> msRead ms 1024
+    bss <- lines . filter (/= '\r') . S8.unpack <$> msRead ms 1024
     last bss `shouldBe` out
     let hs = mapMaybe toHeader bss
     lookup "Content-Range" hs `shouldBe` fmap ("bytes " ++) crange
@@ -48,7 +48,7 @@ testPartial :: Integer -- ^ file size
 testPartial size offset count out = it title $ withApp defaultSettings app $ withMySocket $ \ms -> do
     msWrite ms "GET / HTTP/1.0\r\n\r\n"
     threadDelay 10000
-    bss <- (lines . filter (/= '\r') . S8.unpack) <$> msRead ms 1024
+    bss <- lines . filter (/= '\r') . S8.unpack <$> msRead ms 1024
     out `shouldBe` last bss
     let hs = mapMaybe toHeader bss
     lookup "Content-Length" hs `shouldBe` Just (show $ length $ last bss)

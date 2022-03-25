@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.Wai.ParseSpec (main, spec) where
 
-import           Test.HUnit
 import           Test.Hspec
+import           Test.HUnit
 
 import           Control.Monad.Trans.Resource (runResourceT, withInternalState)
 import qualified Data.ByteString              as S

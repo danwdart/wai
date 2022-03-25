@@ -63,13 +63,13 @@ import           Data.Typeable                        (Typeable)
 import           GHC.IO.Exception                     (IOErrorType (..))
 import           Network.Socket                       (SockAddr, Socket, accept,
                                                        close, withSocketsDo)
+import qualified UnliftIO.Exception                   as E
 import           UnliftIO.Exception                   (Exception, IOException,
                                                        SomeException (..),
                                                        bracket, finally,
                                                        fromException, handle,
                                                        handleJust, onException,
                                                        throwIO, try)
-import qualified UnliftIO.Exception                   as E
 #if MIN_VERSION_network(3,1,1)
 import           Network.Socket                       (gracefulClose)
 #endif

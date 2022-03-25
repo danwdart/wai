@@ -2,8 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module WaiExtraSpec (spec, toRequest) where
 
-import           Test.HUnit                                hiding (Test)
 import           Test.Hspec
+import           Test.HUnit                                hiding (Test)
 #if MIN_VERSION_base(4,8,0)
 import           Data.Monoid                               ((<>))
 #else

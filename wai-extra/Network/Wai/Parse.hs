@@ -60,8 +60,8 @@ import qualified Data.ByteString.Char8        as S8
 import qualified Data.ByteString.Lazy         as L
 import           Data.CaseInsensitive         (mk)
 import           Data.Function                (fix, on)
-import           Data.IORef
 import           Data.Int                     (Int64)
+import           Data.IORef
 import           Data.List                    (sortBy)
 import           Data.Maybe                   (catMaybes, fromMaybe)
 import           Data.Word                    (Word8)
@@ -402,7 +402,7 @@ sinkRequestBodyEx o s r body = do
                 Left y'  -> ((y':y, z), ())
                 Right z' -> ((y, z':z), ())
     conduitRequestBodyEx o s r body add
-    (Data.Bifunctor.bimap reverse reverse) <$> readIORef ref
+    Data.Bifunctor.bimap reverse reverse <$> readIORef ref
 
 conduitRequestBodyEx :: ParseRequestBodyOptions
                      -> BackEnd y

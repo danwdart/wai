@@ -84,7 +84,7 @@ fileHelperLR :: ETagLookup
              -> FilePath -- ^ file location
              -> Piece -- ^ file name
              -> IO LookupResult
-fileHelperLR a b c = (maybe LRNotFound LRFile) <$> fileHelper a b c
+fileHelperLR a b c = maybe LRNotFound LRFile <$> fileHelper a b c
 
 -- | Attempt to load up a @File@ from the given path.
 fileHelper :: ETagLookup
@@ -152,7 +152,7 @@ fileSystemLookup hashFunc prefix pieces = do
             de <- doesDirectoryExist fp
             if de
                 then do
-                    entries' <- (filter isVisible) <$> getDirectoryContents fp
+                    entries' <- filter isVisible <$> getDirectoryContents fp
                     entries <- forM entries' $ \fpRel' -> do
                         let name = unsafeToPiece $ T.pack fpRel'
                             fp' = fp </> fpRel'

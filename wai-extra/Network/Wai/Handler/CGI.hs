@@ -27,8 +27,8 @@ import qualified Network.HTTP.Types                as H
 import           Network.Socket                    (addrAddress, getAddrInfo)
 import           Network.Wai
 import           Network.Wai.Internal
-import           System.IO                         (Handle)
 import qualified System.IO
+import           System.IO                         (Handle)
 #if __GLASGOW_HASKELL__ < 710
 import           Data.Monoid                       (mappend, mconcat, mempty)
 #endif

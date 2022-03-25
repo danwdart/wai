@@ -17,9 +17,9 @@ import           Network.Wai.Internal                   (Response (..))
 import qualified UnliftIO
 
 import           Network.Wai.Handler.Warp.File
+import           Network.Wai.Handler.Warp.Header
 import           Network.Wai.Handler.Warp.HTTP2.Request (getHTTP2Data)
 import           Network.Wai.Handler.Warp.HTTP2.Types
-import           Network.Wai.Handler.Warp.Header
 import qualified Network.Wai.Handler.Warp.Response      as R
 import qualified Network.Wai.Handler.Warp.Settings      as S
 import           Network.Wai.Handler.Warp.Types
